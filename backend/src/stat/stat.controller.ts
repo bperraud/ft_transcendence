@@ -1,4 +1,11 @@
-import { Controller, Patch, Body, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Patch,
+  Body,
+  Get,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { UseGuards } from '@nestjs/common';
 import { GetUser } from '../auth/decorator';
@@ -16,14 +23,12 @@ export class StatController {
   }
 
   @Get('get-history/:id')
-  getHistory(@Param('id') id: string) {
-    const parseId = parseInt(id.toString());
-    return this.statService.getHistory(parseId);
+  getHistory(@Param('id', ParseIntPipe) id: number) {
+    return this.statService.getHistory(id);
   }
 
   @Get('get-stat/:id')
-  getStat(@Param('id') id: string) {
-    const parseId = parseInt(id.toString());
-    return this.statService.getStat(parseId);
+  getStat(@Param('id', ParseIntPipe) id: number) {
+    return this.statService.getStat(id);
   }
 }

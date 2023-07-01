@@ -524,7 +524,7 @@
 			body: JSON.stringify({ friendId: friendId })
 		});
 	}
-	
+
 	function findChat(user1: string, user2: string) {
 		let foundChat;
 
@@ -553,7 +553,7 @@
 	}
 
 	async function fetchFriends() {
-		const res = await fetchWithToken('users/me/friends');
+		const res = await fetchWithToken('friend/me');
 		const data = await res.json();
 		$contacts = data;
 		return data;

@@ -13,6 +13,7 @@ import {
   Get,
   Param,
   StreamableFile,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { GetUser } from '../auth/decorator';
 import { JwtGuard } from '../auth/guard';
@@ -35,22 +36,9 @@ export class UserController {
     return user;
   }
 
-  @Get('avatar/me')
-  getMyPhoto(@GetUser() user) {
-    const path = join(process.cwd(), '/upload', `${user.login}.png`);
-    if (!fs.existsSync(path)) {
-      throw new NotFoundException('Avatar not found');
-    }
-    const file = createReadStream(
-      join(process.cwd(), '/upload', `${user.login}.png`),
-    );
-    return new StreamableFile(file);
-  }
-
   @Get('info/:id')
-  getInfo(@Param('id') id: string) {
-    const parseId = parseInt(id.toString());
-    return this.prisma.user.findUnique({ where: { id: parseId } });
+  getInfo(@Param('id', ParseIntPipe) id: number) {
+    return this.prisma.user.findUnique({ where: { id: id } });
   }
 
   @Get('info/name/:username')
@@ -68,17 +56,6 @@ export class UserController {
     const file = createReadStream(join(process.cwd(), '/upload', `${id}.png`));
     return new StreamableFile(file);
   }
-
-//  @Get('me/friends')
-//  async getUserFriends(@GetUser() user) {
-//    const friends = (await this.prisma.user.findMany({
-//      where: { id: { in: user.friends } },
-//    })) as any;
-//    friends.forEach((friend) => {
-//      friend.status = this.userService.getStatus(friend.id);
-//    });
-//    return friends;
-//  }
 
   @Patch('edit')
   async editUser(@GetUser('id') userId: number, @Body() dto: EditUserDto) {
@@ -101,17 +78,6 @@ export class UserController {
   ) {
     return this.userService.saveImageFromBuffer(file, `${id}.png`);
   }
-
-//  @Patch('remove-friend')
-//  async removeFriend(@GetUser('id') id, @Body() dto: FriendDto) {
-//    if (id == dto.friendId)
-//      throw new ForbiddenException('You cannot remove yourself as a friend');
-//    const prisma_friend = await this.prisma.user.findUnique({
-//      where: { id: dto.friendId },
-//    });
-//    if (!prisma_friend) throw new NotFoundException('User not found');
-//    return await this.userService.removeFriend(id, prisma_friend.id);
-//  }
 
   @Get('me/blocks')
   getMyBlocks(@GetUser() user) {

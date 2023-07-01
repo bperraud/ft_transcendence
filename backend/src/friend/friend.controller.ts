@@ -2,13 +2,13 @@ import {
   Controller,
   UseGuards,
   ForbiddenException,
-  Body,
+  Param,
   NotFoundException,
   Get,
   Patch,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
-import { FriendDto } from './dto';
 import { GetUser } from '../auth/decorator';
 import { UserService } from '../user/user.service';
 import { PrismaClient } from '@prisma/client';
@@ -18,7 +18,7 @@ import { PrismaClient } from '@prisma/client';
 export class FriendController {
   constructor(private userService: UserService, private prisma: PrismaClient) {}
 
-  @Get('me/friends')
+  @Get('me')
   async getUserFriends(@GetUser() user) {
     const friends = (await this.prisma.user.findMany({
       where: { id: { in: user.friends } },
@@ -29,12 +29,15 @@ export class FriendController {
     return friends;
   }
 
-  @Patch('remove-friend')
-  async removeFriend(@GetUser('id') id, @Body() dto: FriendDto) {
-    if (id == dto.friendId)
+  @Patch('remove/:id')
+  async removeFriend(
+    @GetUser('id') id,
+    @Param('id', ParseIntPipe) friendId: number,
+  ) {
+    if (id == friendId)
       throw new ForbiddenException('You cannot remove yourself as a friend');
     const prisma_friend = await this.prisma.user.findUnique({
-      where: { id: dto.friendId },
+      where: { id: friendId },
     });
     if (!prisma_friend) throw new NotFoundException('User not found');
     return await this.userService.removeFriend(id, prisma_friend.id);
