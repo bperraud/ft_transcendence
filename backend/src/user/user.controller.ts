@@ -85,21 +85,19 @@ export class UserController {
     return blocks;
   }
 
-  @Post('block')
+  @Post('block/:id')
   async blockUser(
-    @Body('userId') userId: number,
-    @Body('blockedId') blockedId: number,
+    @GetUser('id') id: number,
+    @Param('id', ParseIntPipe) blockedId: number,
   ) {
-    const block = this.userService.blockUser(userId, blockedId);
-    return block;
+    return this.userService.blockUser(id, blockedId);
   }
 
-  @Post('unblock')
+  @Post('unblock/:id')
   async unblockUser(
-    @Body('userId') userId: number,
-    @Body('blockedId') blockedId: number,
+    @GetUser('id') id: number,
+    @Param('id', ParseIntPipe) blockedId: number,
   ) {
-    const block = this.userService.unblockUser(userId, blockedId);
-    return block;
+    return this.userService.unblockUser(id, blockedId);
   }
 }

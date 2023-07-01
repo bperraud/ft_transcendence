@@ -6,8 +6,6 @@
 
 	const fetchWithToken = Context.fetchWithToken();
 	const fetchMe = Context.fetchMe();
-	const fetchBlockUser = Context.fetchBlockUser();
-	const fetchUnblockUser = Context.fetchUnblockUser();
 	const openEditProfile = Context.openEditProfile();
 	const blocks = Context.blocks();
 	const friends = Context.contacts();
@@ -35,6 +33,20 @@
 			.catch(() => {
 				imgUrl = '/avatar.png';
 			});
+	}
+
+	async function blockUser( userId : number){
+		const res = await fetchWithToken(`users/block/${userId}`, {
+			method: 'POST'
+		});
+		$blocks = [...$blocks, await res.json()];
+	}
+
+	async function unblockUser( userId : number){
+		await fetchWithToken(`users/unblock/${userId}`, {
+			method: 'POST'
+		});
+		$blocks = $blocks.filter((block) => block.blockedId !== userId);
 	}
 
 	const createdAt = $user?.createdAt;
@@ -114,14 +126,14 @@
 		{#if isUser}
 			<button class="button-alone" type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
 		{:else if $blocks.some((block) => block.blockedId === $currentUser?.id)}
-			<button class="button-alone" type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
+			<button class="button-alone" type="button" on:click={() => unblockUser($currentUser.id)}>UnBlock</button>
 		{:else if $blocks.some((block) => block.blockedId === $currentUser?.id)}
-			<button class="button-alone" type="button" on:click={() => fetchUnblockUser($currentUser.id)}>UnBlock</button>
+			<button class="button-alone" type="button" on:click={() => unblockUser($currentUser.id)}>UnBlock</button>
 		{:else}
 			<div class="buttons">
 				<button type="button" on:click={() => startChat($currentUser)}>Open chat</button>
 				<button type="button" on:click={() => askGame($currentUser.id)}>Ask game</button>
-				<button type="button" on:click={() => fetchBlockUser($currentUser.id)}>Block</button>
+				<button type="button" on:click={() => blockUser($currentUser.id)}>Block</button>
 			</div>
 		{/if}
 	</ul>

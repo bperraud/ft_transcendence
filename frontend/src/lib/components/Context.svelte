@@ -566,30 +566,6 @@
 		return data;
 	}
 
-	async function fetchBlockUser(userId: number) {
-		const res = await fetchWithToken('users/block', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ userId: $user?.id, blockedId: userId })
-		});
-		if (!res) return;
-		const data = await res.json();
-		$blocks = [...$blocks, data];
-		return data;
-	}
-
-	async function fetchUnblockUser(userId: number) {
-		const res = await fetchWithToken('users/unblock', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ userId: $user?.id, blockedId: userId })
-		});
-		if (!res) return;
-		const data = await res.json();
-		$blocks = $blocks.filter((block) => block.blockedId !== userId);
-		return data;
-	}
-
 	async function fetchFriendRequest() {
 		const res = await fetchWithToken('notification/get?type=friend');
 		const data = await res.json();
@@ -613,9 +589,7 @@
 			};
 		});
 		$history = data;
-		return new Promise((resolve, reject) => {
-			resolve(data);
-		});
+		return data;
 	}
 
 	async function fetchStatistics() {
@@ -726,8 +700,6 @@
 	setContext('fetchUserByUsername', fetchUserByUsername);
 	setContext('fetchUserById', fetchUserById);
 	setContext('fetchUpdateLastMessageRead', fetchUpdateLastMessageRead);
-	setContext('fetchBlockUser', fetchBlockUser);
-	setContext('fetchUnblockUser', fetchUnblockUser);
 	setContext('fetchFriends', fetchFriends);
 	setContext('fetchGetUserBlocks', fetchGetUserBlocks);
 	setContext('fetchFriendRequest', fetchFriendRequest);
