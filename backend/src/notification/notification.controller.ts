@@ -2,7 +2,7 @@ import { Controller, Post, UseGuards, Body, Get, Query } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
-import { FriendDto } from 'src/user/dto';
+import { FriendDto } from 'src/friend/dto';
 import { PrismaClient } from '@prisma/client';
 import { NotificationService } from './notification.service';
 import { ResponseDto } from './dto';

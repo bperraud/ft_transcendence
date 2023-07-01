@@ -9,7 +9,6 @@ import {
   ParseFilePipe,
   FileTypeValidator,
   MaxFileSizeValidator,
-  ForbiddenException,
   NotFoundException,
   Get,
   Param,
@@ -17,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { GetUser } from '../auth/decorator';
 import { JwtGuard } from '../auth/guard';
-import { EditUserDto, FriendDto } from './dto';
+import { EditUserDto } from './dto';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PrismaClient } from '@prisma/client';
@@ -70,17 +69,16 @@ export class UserController {
     return new StreamableFile(file);
   }
 
-  @UseGuards(JwtGuard)
-  @Get('me/friends')
-  async getUserFriends(@GetUser() user) {
-    const friends = (await this.prisma.user.findMany({
-      where: { id: { in: user.friends } },
-    })) as any;
-    friends.forEach((friend) => {
-      friend.status = this.userService.getStatus(friend.id);
-    });
-    return friends;
-  }
+//  @Get('me/friends')
+//  async getUserFriends(@GetUser() user) {
+//    const friends = (await this.prisma.user.findMany({
+//      where: { id: { in: user.friends } },
+//    })) as any;
+//    friends.forEach((friend) => {
+//      friend.status = this.userService.getStatus(friend.id);
+//    });
+//    return friends;
+//  }
 
   @Patch('edit')
   async editUser(@GetUser('id') userId: number, @Body() dto: EditUserDto) {
@@ -104,16 +102,16 @@ export class UserController {
     return this.userService.saveImageFromBuffer(file, `${id}.png`);
   }
 
-  @Patch('remove-friend')
-  async removeFriend(@GetUser('id') id, @Body() dto: FriendDto) {
-    if (id == dto.friendId)
-      throw new ForbiddenException('You cannot remove yourself as a friend');
-    const prisma_friend = await this.prisma.user.findUnique({
-      where: { id: dto.friendId },
-    });
-    if (!prisma_friend) throw new NotFoundException('User not found');
-    return await this.userService.removeFriend(id, prisma_friend.id);
-  }
+//  @Patch('remove-friend')
+//  async removeFriend(@GetUser('id') id, @Body() dto: FriendDto) {
+//    if (id == dto.friendId)
+//      throw new ForbiddenException('You cannot remove yourself as a friend');
+//    const prisma_friend = await this.prisma.user.findUnique({
+//      where: { id: dto.friendId },
+//    });
+//    if (!prisma_friend) throw new NotFoundException('User not found');
+//    return await this.userService.removeFriend(id, prisma_friend.id);
+//  }
 
   @Get('me/blocks')
   getMyBlocks(@GetUser() user) {
@@ -121,7 +119,6 @@ export class UserController {
     return blocks;
   }
 
-  @UseGuards(JwtGuard)
   @Post('block')
   async blockUser(
     @Body('userId') userId: number,
@@ -131,7 +128,6 @@ export class UserController {
     return block;
   }
 
-  @UseGuards(JwtGuard)
   @Post('unblock')
   async unblockUser(
     @Body('userId') userId: number,
