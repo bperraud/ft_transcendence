@@ -6,8 +6,8 @@ import { FriendDto } from 'src/friend/dto';
 import { PrismaClient } from '@prisma/client';
 import { NotificationService } from './notification.service';
 import { ResponseDto } from './dto';
-import { UserService } from 'src/user/user.service';
 import { WebSocketService } from 'src/websocket/websocket.service';
+import { FriendService } from 'src/friend/friend.service';
 
 @UseGuards(JwtGuard)
 @Controller('notification')
@@ -15,8 +15,8 @@ export class NotificationController {
   constructor(
     private prisma: PrismaClient,
     private notifService: NotificationService,
-    private userService: UserService,
     private socketService: WebSocketService,
+    private friendService: FriendService,
   ) {}
 
   @Post('add-friend')
@@ -27,7 +27,7 @@ export class NotificationController {
     if (!prisma_friend) throw new NotFoundException('User not found');
     else if (user.id == prisma_friend.id)
       throw new ForbiddenException('You cannot add yourself as a friend');
-    else if (await this.userService.findFriend(user.id, prisma_friend.id)) {
+    else if (await this.friendService.findFriend(user.id, prisma_friend.id)) {
       throw new ForbiddenException('You are already friends');
     }
     return await this.notifService.notifyEvent(prisma_friend, user, 'friend');
@@ -37,7 +37,7 @@ export class NotificationController {
   async responseFriend(@GetUser('id') id, @Body() dto: ResponseDto) {
     await this.notifService.removeNotification(id, dto.friendId, 'friend');
     if (dto.response) {
-      return await this.userService.addFriend(id, dto.friendId);
+      return await this.friendService.addFriend(id, dto.friendId);
     }
     return { message: 'declined' };
   }

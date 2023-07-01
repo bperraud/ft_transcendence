@@ -12,11 +12,16 @@ import { JwtGuard } from '../auth/guard';
 import { GetUser } from '../auth/decorator';
 import { UserService } from '../user/user.service';
 import { PrismaClient } from '@prisma/client';
+import { FriendService } from './friend.service';
 
 @UseGuards(JwtGuard)
 @Controller('friend')
 export class FriendController {
-  constructor(private userService: UserService, private prisma: PrismaClient) {}
+  constructor(
+    private friendService: FriendService,
+    private userService: UserService,
+    private prisma: PrismaClient,
+  ) {}
 
   @Get('me')
   async getUserFriends(@GetUser() user) {
@@ -40,6 +45,6 @@ export class FriendController {
       where: { id: friendId },
     });
     if (!prisma_friend) throw new NotFoundException('User not found');
-    return await this.userService.removeFriend(id, prisma_friend.id);
+    return await this.friendService.removeFriend(id, prisma_friend.id);
   }
 }
