@@ -24,15 +24,14 @@
 		fetchWithToken(`users/avatar/${$currentUser?.id}`)
 			.then((res) => {
 				if (res.status === 200 || res.status === 201) {
-					return res.blob();
+					return res.blob()
+					.then((blob) => {
+						imgUrl = URL.createObjectURL(blob);
+					});
 				} else {
-					throw new Error('Avatar fetch failed');
+					imgUrl = '/avatar.png';
 				}
 			})
-			.then((blob) => (imgUrl = URL.createObjectURL(blob)))
-			.catch(() => {
-				imgUrl = '/avatar.png';
-			});
 	}
 
 	async function blockUser( userId : number){
@@ -125,8 +124,6 @@
 		</div>
 		{#if isUser}
 			<button class="button-alone" type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
-		{:else if $blocks.some((block) => block.blockedId === $currentUser?.id)}
-			<button class="button-alone" type="button" on:click={() => unblockUser($currentUser.id)}>UnBlock</button>
 		{:else if $blocks.some((block) => block.blockedId === $currentUser?.id)}
 			<button class="button-alone" type="button" on:click={() => unblockUser($currentUser.id)}>UnBlock</button>
 		{:else}

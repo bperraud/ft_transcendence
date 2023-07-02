@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { writable } from 'svelte/store';
 	import { onDestroy } from 'svelte';
 	import { user } from '$lib/stores';
 	import { Context } from '$lib/components/Context.svelte';
@@ -6,14 +7,20 @@
 
 	const chats = Context.chats();
 	const chatId = Context.chatId();
+	const blocks = Context.blocks();
 	const friendInfoId = Context.friendInfoId();
 	const openChatWindow = Context.openChatWindow();
 	const getUnreadMessagesCount = Context.getUnreadMessagesCount();
 	let now = new Date();
+	let blockedIds = writable<number[]>([]);
 
 	const intervalId = setInterval(() => {
 		now = new Date();
 	}, 30000);
+
+	$: {
+		blockedIds.set($blocks.map((block) => block.blockedId));
+	}
 
 	onDestroy(() => {
 		clearInterval(intervalId);
@@ -31,6 +38,10 @@
 		} else {
 			return 'No messages yet';
 		}
+	}
+
+	function getFriendId(chat: any) {
+		return chat.chatUsers.find((c: any) => c.userId !== $user?.id)?.user?.id;
 	}
 
 	function timeDifference(current: Date, previous: Date) {
@@ -82,10 +93,14 @@
 						{#if chat.messages.length > 0}
 							<div class="message-details">
 								<p>
+									{#if $blockedIds.includes(getFriendId(chat))}
 									{chat.messages[chat.messages.length - 1].userId === $user?.id
 										? 'you'
 										: getLastMessageSender(chat)}
-									: {chat.messages[chat.messages.length - 1].content}
+									: { chat.messages[chat.messages.length - 1].content }
+								{:else}
+									{ 'blocked user' }
+								{/if}
 								</p>
 								<span class="timestamp"
 									>{timeDifference(

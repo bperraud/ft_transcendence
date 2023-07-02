@@ -101,16 +101,16 @@
 		fetchWithToken(`users/avatar/${$user?.id}`)
 			.then((res) => {
 				if (res.status === 200 || res.status === 201) {
-					return res.blob();
+					return res.blob()
+					.then((blob) => {
+						imgUrl = URL.createObjectURL(blob);
+					});
 				} else {
-					throw new Error('Avatar fetch failed');
+					imgUrl = '/avatar.png';
 				}
 			})
-			.then((blob) => (imgUrl = URL.createObjectURL(blob)))
-			.catch(() => {
-				imgUrl = '/avatar.png';
-			});
 	}
+
 </script>
 
 <div class="window-body">
