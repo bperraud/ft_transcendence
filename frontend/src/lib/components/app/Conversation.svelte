@@ -93,13 +93,13 @@
 						{#if chat.messages.length > 0}
 							<div class="message-details">
 								<p>
-									{#if $blockedIds.includes(getFriendId(chat))}
+									{#if !$blockedIds.includes(getFriendId(chat))}
 									{chat.messages[chat.messages.length - 1].userId === $user?.id
 										? 'you'
 										: getLastMessageSender(chat)}
 									: { chat.messages[chat.messages.length - 1].content }
 								{:else}
-									{ 'blocked user' }
+									{ 'blocked' }
 								{/if}
 								</p>
 								<span class="timestamp"
