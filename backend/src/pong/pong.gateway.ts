@@ -31,21 +31,28 @@ type Input = {
 })
 export class PongGateway extends SocketGateway {
   constructor(
-    protected readonly pongService: PongService, // Inject additional provider
+    protected readonly pongService: PongService,
     protected readonly statService: StatService,
     protected readonly notificationService: NotificationService,
     protected readonly webSocketService: WebSocketService,
     protected readonly authService: AuthService,
     protected readonly userService: UserService,
   ) {
-    super(
-      webSocketService,
-      authService,
-      userService,
-    ); // Call parent class constructor with the required arguments
+    super(webSocketService, authService, userService);
   }
 
   private games: Map<string, PongGame> = new Map();
+
+  async handleDisconnect(client: Socket) {
+    super.handleDisconnect(client);
+    if (this.pongService.getClientRoom(client.id) === undefined) return;
+    const { room, index } = this.pongService.getClientRoom(client.id);
+    this.pongService.removeClientRoom(client.id);
+    if (index !== 0 && index !== 1) return;
+    const game = this.games.get(room);
+    this.gameEnd(game);
+    this.gameOver(Math.abs(index - 1), room);
+  }
 
   @SubscribeMessage('ping')
   handlePing(@ConnectedSocket() client: Socket, @MessageBody() data: number) {
@@ -149,16 +156,5 @@ export class PongGateway extends SocketGateway {
     } else {
       console.log('players not found');
     }
-  }
-
-  async handleDisconnect(client: Socket) {
-    super.handleDisconnect(client);
-    if (this.pongService.getClientRoom(client.id) === undefined) return;
-    const { room, index } = this.pongService.getClientRoom(client.id);
-    this.pongService.removeClientRoom(client.id);
-    if (index !== 0 && index !== 1) return;
-    const game = this.games.get(room);
-    this.gameEnd(game);
-    this.gameOver(Math.abs(index - 1), room);
   }
 }

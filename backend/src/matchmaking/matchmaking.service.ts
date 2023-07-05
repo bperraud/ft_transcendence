@@ -78,7 +78,6 @@ export class MatchmakingService {
 
   handlePlayerLeftQueue(player: number) {
     const queue = this.queue.dequeue_player(player);
-    console.log(this.queue);
     return queue;
   }
 
@@ -86,11 +85,11 @@ export class MatchmakingService {
     const [p1, p2] = players;
     if (this.socketService.getStatus(p1) !== 'queue') {
       this.queue.enqueue(p2);
-      throw new Error('Player not ready');
+      console.log('Player not ready');
     }
     if (this.socketService.getStatus(p2) !== 'queue') {
       this.queue.enqueue(p1);
-      throw new Error('Player not ready');
+      console.log('Player not ready');
     }
     return this.pongService.createRoom(p1, p2);
   }
