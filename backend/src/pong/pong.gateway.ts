@@ -7,6 +7,12 @@ import {
 import { Socket } from 'socket.io';
 import { SocketGateway } from '../websocket/websocket.gateway';
 import { PongGame } from './pong.class';
+import { PongService } from './pong.service';
+import { AuthService } from 'src/auth/auth.service';
+import { UserService } from 'src/user/user.service';
+import { StatService } from 'src/stat/stat.service';
+import { NotificationService } from 'src/notification/notification.service';
+import { WebSocketService } from 'src/websocket/websocket.service';
 
 type Input = {
   clientId: string;
@@ -24,6 +30,21 @@ type Input = {
   },
 })
 export class PongGateway extends SocketGateway {
+  constructor(
+    protected readonly pongService: PongService, // Inject additional provider
+    protected readonly statService: StatService,
+    protected readonly notificationService: NotificationService,
+    protected readonly webSocketService: WebSocketService,
+    protected readonly authService: AuthService,
+    protected readonly userService: UserService,
+  ) {
+    super(
+      webSocketService,
+      authService,
+      userService,
+    ); // Call parent class constructor with the required arguments
+  }
+
   private games: Map<string, PongGame> = new Map();
 
   @SubscribeMessage('ping')
@@ -47,6 +68,23 @@ export class PongGateway extends SocketGateway {
         opponentId: this.webSocketService.getClientId(game.getPlayer2()),
       },
     );
+  }
+
+  @SubscribeMessage('response-game')
+  async handleMatch(
+    @MessageBody() data: { response: boolean; friendId: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const userId = this.webSocketService.getClientId(client);
+    if (
+      data.response &&
+      this.webSocketService.getStatus(userId) === 'online' &&
+      this.webSocketService.getStatus(data.friendId) === 'online' &&
+      !this.pongService.isMatched(userId) &&
+      !this.pongService.isMatched(data.friendId)
+    ) {
+      this.pongService.createRoom(userId, data.friendId);
+    }
   }
 
   @SubscribeMessage('enter-room')
