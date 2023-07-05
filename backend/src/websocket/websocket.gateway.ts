@@ -43,6 +43,7 @@ export abstract class SocketGateway
       : client.handshake.query.token;
 
     const user = await this.authService.validateToken(token);
+    console.log(token);
 
     if (!user) {
       client.disconnect();

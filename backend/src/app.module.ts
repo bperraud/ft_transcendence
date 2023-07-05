@@ -13,6 +13,7 @@ import { WebSocketModule } from './websocket/websocket.module';
 import { NotificationModule } from './notification/notification.module';
 import { SettingsModule } from './settings/settings.module';
 import { FriendModule } from './friend/friend.module';
+import { MinishellModule } from './minishell/minishell.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { FriendModule } from './friend/friend.module';
     NotificationModule,
     SettingsModule,
     FriendModule,
+    MinishellModule,
   ],
   controllers: [AppController],
   providers: [AppService],

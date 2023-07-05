@@ -1,4 +1,12 @@
-import { Controller, Post, Get, Query, Param, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Query,
+  Param,
+  Body,
+  Patch,
+} from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { JwtGuard } from '../auth/guard';
 import { UseGuards } from '@nestjs/common';
@@ -21,7 +29,10 @@ export class ChatController {
     @Query('start') start: string,
     @Query('limit') limit: string,
   ) {
-    const {chats, totalChatsCount} = await this.chatService.getChatsPublic(Number(start), Number(limit));
+    const { chats, totalChatsCount } = await this.chatService.getChatsPublic(
+      Number(start),
+      Number(limit),
+    );
     return { chats, totalChatsCount };
   }
 
@@ -62,13 +73,17 @@ export class ChatController {
       accessibility,
       password,
     );
-    
+
     return newGroupChat;
   }
-  
-  @Post('updateLastMessageRead')
+
+  @Patch('updateLastMessageRead')
   async updateLastMessageRead(@Body() body): Promise<any> {
     const { chatId, messageId, userId } = body;
-    return await this.chatService.updateLastMessageRead(chatId, messageId, userId);
+    return await this.chatService.updateLastMessageRead(
+      chatId,
+      messageId,
+      userId,
+    );
   }
 }

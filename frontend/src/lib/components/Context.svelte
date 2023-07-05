@@ -653,7 +653,7 @@
 		userId: number | undefined
 	) {
 		const response = await fetchWithToken(`chat/updateLastMessageRead`, {
-			method: 'POST',
+			method: 'PATCH',
 			headers: {
 				'Content-Type': 'application/json'
 			},

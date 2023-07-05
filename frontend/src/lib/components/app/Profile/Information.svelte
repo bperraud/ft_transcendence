@@ -36,14 +36,14 @@
 
 	async function blockUser( userId : number){
 		const res = await fetchWithToken(`users/block/${userId}`, {
-			method: 'POST'
+			method: 'PATCH'
 		});
 		$blocks = [...$blocks, await res.json()];
 	}
 
 	async function unblockUser( userId : number){
 		await fetchWithToken(`users/unblock/${userId}`, {
-			method: 'POST'
+			method: 'PATCH'
 		});
 		$blocks = $blocks.filter((block) => block.blockedId !== userId);
 	}

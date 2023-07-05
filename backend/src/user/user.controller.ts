@@ -85,7 +85,7 @@ export class UserController {
     return blocks;
   }
 
-  @Post('block/:id')
+  @Patch('block/:id')
   async blockUser(
     @GetUser('id') id: number,
     @Param('id', ParseIntPipe) blockedId: number,
@@ -93,7 +93,7 @@ export class UserController {
     return this.userService.blockUser(id, blockedId);
   }
 
-  @Post('unblock/:id')
+  @Patch('unblock/:id')
   async unblockUser(
     @GetUser('id') id: number,
     @Param('id', ParseIntPipe) blockedId: number,
