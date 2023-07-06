@@ -5,8 +5,8 @@ import {
   Param,
   NotFoundException,
   Get,
-  Patch,
   ParseIntPipe,
+  Delete,
 } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { GetUser } from '../auth/decorator';
@@ -34,7 +34,7 @@ export class FriendController {
     return friends;
   }
 
-  @Patch('remove/:id')
+  @Delete('remove/:id')
   async removeFriend(
     @GetUser('id') id,
     @Param('id', ParseIntPipe) friendId: number,

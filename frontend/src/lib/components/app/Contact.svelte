@@ -50,7 +50,7 @@
 
 	async function removeFriend(friendId: number) {
 		const res = await fetchWithToken(`friend/remove/${friendId}`, {
-			method: 'PATCH',
+			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json'
 			}

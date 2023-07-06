@@ -174,7 +174,7 @@ export class ChatService {
         ]
       }
     });
-    
+
     return { chats, totalChatsCount };
   }
 
@@ -314,9 +314,7 @@ export class ChatService {
     password?: string,
   ): Promise<void> {
     const accessibility = isProtected ? 'public' : 'protected';
-
     const updateData = { accessibility };
-
     if (password !== undefined) updateData['password'] = password;
 
     await this.prisma.chat.update({
