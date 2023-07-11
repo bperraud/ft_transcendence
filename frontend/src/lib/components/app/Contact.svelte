@@ -2,7 +2,7 @@
 	import { user } from '$lib/stores';
 	import { Context } from '$lib/components/Context.svelte';
 	import NotificationBadge from '../NotificationBadge.svelte';
-	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
+	import ErrorDialog from '$lib/components/dialog/ErrorDialog.svelte';
 
 	const socket = Context.socket();
 	const fetchWithToken = Context.fetchWithToken();

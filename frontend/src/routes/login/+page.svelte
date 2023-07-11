@@ -5,7 +5,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
-	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
+	import ErrorDialog from '$lib/components/dialog/ErrorDialog.svelte';
 
 	onMount(() => {
 		if ($page.url.searchParams.get('token')) {

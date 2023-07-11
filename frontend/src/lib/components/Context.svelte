@@ -128,7 +128,8 @@
 			| 'Internet'
 			| 'Notepad'
 			| 'EditProfile'
-			| 'PongKeybinds';
+			| 'PongKeybinds'
+			| 'Terminal';
 
 		export interface AppInstance {
 			readonly componentType: App;
@@ -258,11 +259,12 @@
 	import Chat from '$lib/components/app/Chat.svelte';
 	import ChatForum from '$lib/components/app/ChatForum.svelte';
 	import Contact from '$lib/components/app/Contact.svelte';
-	import Profile from '$lib/components/app/Profile/Profile.svelte';
+	import Profile from '$lib/components/app/profile/Profile.svelte';
 	import Forum from '$lib/components/app/Forum.svelte';
 	import Conversation from '$lib/components/app/Conversation.svelte';
 	import Internet from '$lib/components/app/Internet.svelte';
 	import Notepad from '$lib/components/app/Notepad.svelte';
+	import Terminal from '$lib/components/app/Terminal.svelte';
 	import FriendRequest from '$lib/components/app/FriendRequest.svelte';
 	import EditProfile from '$lib/components/app/EditProfile.svelte';
 	import PongKeybinds from '$lib/components/app/pong/PongKeybinds.svelte';
@@ -382,6 +384,7 @@
 		Internet: Internet,
 		Notepad: Notepad,
 		EditProfile: EditProfile,
+		Terminal: Terminal,
 		PongKeybinds: PongKeybinds
 	});
 
@@ -470,6 +473,10 @@
 		EditProfile: {
 			TabProps: { name: 'EditProfile', icon: '/computer.png' },
 			DesktopProps: { name: 'EditProfile', icon: '/computer.png' }
+		},
+		Terminal : {
+			TabProps: { name: 'Terminal', icon: '/shell.png' },
+			DesktopProps: { name: 'Terminal', icon: '/shell.png' }
 		},
 		PongKeybinds: {
 			TabProps: { name: 'Keybinds', icon: '/computer.png' },

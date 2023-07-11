@@ -168,11 +168,8 @@ export class ChatService {
 
     const totalChatsCount = await this.prisma.chat.count({
       where: {
-        OR: [
-          { accessibility: 'public' },
-          { accessibility: 'protected' }
-        ]
-      }
+        OR: [{ accessibility: 'public' }, { accessibility: 'protected' }],
+      },
     });
 
     return { chats, totalChatsCount };

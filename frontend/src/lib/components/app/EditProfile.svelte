@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
-	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
-	import TwoFactorDialog from '$lib/components/app/Profile/TwoFactorDialog.svelte';
+	import ErrorDialog from '$lib/components/dialog/ErrorDialog.svelte';
+	import TwoFactorDialog from '$lib/components/app/profile/TwoFactorDialog.svelte';
 
 	const fetchWithToken = Context.fetchWithToken();
 	const addInstance = Context.addInstance();

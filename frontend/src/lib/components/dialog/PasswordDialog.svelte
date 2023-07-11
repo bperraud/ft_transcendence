@@ -1,6 +1,6 @@
 
 <script lang="ts">
-	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
+	import ErrorDialog from '$lib/components/dialog/ErrorDialog.svelte';
 	import { Context } from '$lib/components/Context.svelte';
 
 	const socket = Context.socket();

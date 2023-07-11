@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Context } from '$lib/components/Context.svelte';
-	import ErrorDialog from '$lib/components/ErrorDialog.svelte';
+	import ErrorDialog from '$lib/components/dialog/ErrorDialog.svelte';
 	import { token } from '$lib/stores';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';

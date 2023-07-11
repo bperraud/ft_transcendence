@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
-	import PasswordDialog from './PasswordDialog.svelte';
+	import PasswordDialog from '$lib/components/dialog/PasswordDialog.svelte';
 
 	const chatId = Context.chatId();
 	const chats = Context.chats();
