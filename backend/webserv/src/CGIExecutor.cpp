@@ -1,18 +1,45 @@
 #include "CGIExecutor.hpp"
 #include "HttpHandler.hpp"
+
 extern char **environ;
 
 CGIExecutor::CGIExecutor()
 {
 }
 
+std::string CGIExecutor::url_decode(const std::string& input) {
+    std::ostringstream decoded;
+    std::istringstream encoded(input);
+
+    char c;
+    int hex;
+    while (encoded.get(c)) {
+        if (c == '%') {
+            char hex1, hex2;
+            if (encoded.get(hex1) && encoded.get(hex2)) {
+                int digit1 = hex1 >= 'A' ? (hex1 & 0xDF) - 'A' + 10 : (hex1 - '0');
+                int digit2 = hex2 >= 'A' ? (hex2 & 0xDF) - 'A' + 10 : (hex2 - '0');
+                char decodedChar = (digit1 << 4) + digit2;
+                decoded << decodedChar;
+            } else {
+                // Invalid encoding, handle error
+            }
+        } else if (c == '+') {
+            decoded << ' ';
+        } else {
+            decoded << c;
+        }
+    }
+
+    return decoded.str();
+}
+
 void CGIExecutor::setupEnv(const HttpMessage &request, const std::string &url)
 {
 	std::string request_method = "REQUEST_METHOD=" + request.method;
 	putenv(const_cast<char *>(request_method.c_str()));
-
 	std::string query_string = url.substr(url.find("?") + 1);
-	setenv("QUERY_STRING", query_string.c_str(), 1);
+	setenv("QUERY_STRING", url_decode(query_string).c_str(), 1);
 
 	if (request.body_length)
 	{
@@ -80,7 +107,6 @@ int CGIExecutor::run_minishell_cmd(const std::string &input, std::stringstream *
 	std::string res;
 
 	write(_minishell.writer, input.c_str(), input.length() + 1);
-
 	if (input == "exit") {
 		_minishell.running = false;
 		close(_minishell.reader);

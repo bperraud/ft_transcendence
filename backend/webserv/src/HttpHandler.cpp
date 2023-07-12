@@ -299,6 +299,7 @@ void HttpHandler::handleCGI(const std::string &original_url)
 	}
 	std::string cookies = "";
 	_response.map_headers["Cookie"] = "";
+
 	int err = CGIExecutor::run(_request, &_response_body_stream, &cookies, _active_route->handler, _active_route->cgi[extension], original_url);
 	if (err)
 		error(err);

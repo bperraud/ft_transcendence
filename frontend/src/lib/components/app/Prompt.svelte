@@ -21,7 +21,8 @@
 	}
 
 	async function run_cmd(input: string) {
-		const res = await fetchWithTokenWebServer(`minishell/?${input}`, {
+		const encodedInput = encodeURIComponent(input);
+		const res = await fetchWithTokenWebServer(`minishell/?${encodedInput}`, {
 			method: 'GET'
 		});
 		const data = await res.text();
