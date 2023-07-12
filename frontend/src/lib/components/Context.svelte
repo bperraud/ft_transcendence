@@ -129,7 +129,7 @@
 			| 'Notepad'
 			| 'EditProfile'
 			| 'PongKeybinds'
-			| 'Terminal';
+			| 'Prompt';
 
 		export interface AppInstance {
 			readonly componentType: App;
@@ -264,7 +264,7 @@
 	import Conversation from '$lib/components/app/Conversation.svelte';
 	import Internet from '$lib/components/app/Internet.svelte';
 	import Notepad from '$lib/components/app/Notepad.svelte';
-	import Terminal from '$lib/components/app/Terminal.svelte';
+	import Prompt from '$lib/components/app/Prompt.svelte';
 	import FriendRequest from '$lib/components/app/FriendRequest.svelte';
 	import EditProfile from '$lib/components/app/EditProfile.svelte';
 	import PongKeybinds from '$lib/components/app/pong/PongKeybinds.svelte';
@@ -384,7 +384,7 @@
 		Internet: Internet,
 		Notepad: Notepad,
 		EditProfile: EditProfile,
-		Terminal: Terminal,
+		Prompt: Prompt,
 		PongKeybinds: PongKeybinds
 	});
 
@@ -474,9 +474,9 @@
 			TabProps: { name: 'EditProfile', icon: '/computer.png' },
 			DesktopProps: { name: 'EditProfile', icon: '/computer.png' }
 		},
-		Terminal : {
-			TabProps: { name: 'Terminal', icon: '/shell.png' },
-			DesktopProps: { name: 'Terminal', icon: '/shell.png' }
+		Prompt : {
+			TabProps: { name: 'Prompt', icon: '/shell.png' },
+			DesktopProps: { name: 'Prompt', icon: '/shell.png' }
 		},
 		PongKeybinds: {
 			TabProps: { name: 'Keybinds', icon: '/computer.png' },
