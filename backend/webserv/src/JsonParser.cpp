@@ -3,7 +3,7 @@
 JsonParser::JsonParser(char *configFile) {
 	std::ifstream infile(configFile);
 	if (!infile.is_open())
-		throw std::runtime_error("Unable to open file");
+		throw std::runtime_error("Unable to open config file");
 	std::ostringstream oss;
 	oss << infile.rdbuf(); // read file contents into stringstream
 	std::string str = oss.str();
