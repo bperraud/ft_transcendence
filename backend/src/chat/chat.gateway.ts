@@ -40,27 +40,23 @@ export class ChatGateway extends SocketGateway {
     payload: {
       groupName: string;
       memberUsernames: string[];
-      isGroupChat: boolean;
       accessibility: string;
       password?: string;
     },
   ) {
-    const newGroupChat = await this.chatService.createChat(
+    const result = await this.chatService.createChat(
       payload.groupName,
       payload.memberUsernames,
-      payload.isGroupChat,
       payload.accessibility,
       payload.password,
     );
 
-    for (const member of newGroupChat.chatUsers) {
-      const memberSocket = this.webSocketService.getSocket(
-        (member as any).user.username,
-      );
-      if (memberSocket) memberSocket.join(`chat-${newGroupChat.id}`);
+    for (const member of result.participants) {
+      const memberSocket = this.webSocketService.getSocket(member);
+      if (memberSocket) memberSocket.join(`chat-${result.groupId}`);
     }
-    this.server.to(`chat-${newGroupChat.id}`).emit('addChat', newGroupChat);
-    client.emit('createChat', newGroupChat.id);
+    this.server.to(`chat-${result.groupId}`).emit('addChat', result.groupId);
+    client.emit('createChat', result.groupId);
   }
 
   @SubscribeMessage('otherAddChat')
@@ -217,14 +213,14 @@ export class ChatGateway extends SocketGateway {
   @SubscribeMessage('changeRole')
   async handleChangeRole(
     client: Socket,
-    payload: { chatId: number; userId: number; newRoleId: number },
+    payload: { chatId: number; userId: number; newRole: string },
   ) {
-    const { chatId, userId, newRoleId } = payload;
-    await this.chatService.changeRole(chatId, userId, newRoleId);
+    const { chatId, userId, newRole } = payload;
+    await this.chatService.changeRole(chatId, userId, newRole);
     this.server.to(`chat-${chatId}`).emit('updateRole', {
       chatId: chatId,
       userId: userId,
-      newRoleId: newRoleId,
+      newRole: newRole,
     });
     return;
   }

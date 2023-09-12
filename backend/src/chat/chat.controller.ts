@@ -62,14 +62,12 @@ export class ChatController {
   async createChat(
     @Body('groupName') groupName: string,
     @Body('memberUsernames') memberUsernames: string[],
-    @Body('isGroupChat') isGroupChat: boolean,
     @Body('accessibility') accessibility: string,
     @Body('password') password?: string,
   ) {
     const newGroupChat = await this.chatService.createChat(
       groupName,
       memberUsernames,
-      isGroupChat,
       accessibility,
       password,
     );

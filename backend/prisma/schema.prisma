@@ -106,6 +106,8 @@ model Message {
   receiver      User     @relation("receiver", fields: [senderId], references: [id])
 }
 
+
+// public password ???
 model Chat {  // group chat
 	id            Int        @id @default(autoincrement())
 

@@ -6,7 +6,8 @@ import { Chat, Message } from '../chat/model/chat.model';
 export class ChatService {
   constructor(private prisma: PrismaService) {}
 
-  async getAllUserChats(username: string): Promise<Chat[]> {
+  async getAllUserChats(username: string) {
+    // async getAllUserChats(username: string): Promise<Chat[]> {
     //const chats = await this.prisma.chat.findMany({
     //  where: {
     //    chatUsers: {
@@ -35,10 +36,10 @@ export class ChatService {
 
   async createChat(
     groupName: string,
-    memberId: number[],
+    memberUsernames: string[],
     accessibility: string,
     password?: string,
-  ): Promise<Chat | null> {
+  ): Promise<{ groupId: number; participants: number[] }> {
     const newGroupChat = await this.prisma.chat.create({
       data: {
         name: groupName,
@@ -49,24 +50,42 @@ export class ChatService {
       },
     });
 
-    const chatId = newGroupChat.id;
+    let user;
 
-    memberId.forEach(async (userId) => {
-      await this.prisma.groupParticipant.create({
-        data: {
-          chatId: chatId,
-          userId: userId,
-          chat: {
-            connect: { id: chatId },
-          },
-          user: {
-            connect: { id: userId },
-          },
+    let participants: number[];
+    const groupId = newGroupChat.id;
+    memberUsernames.forEach(async (userName) => {
+      user = await this.prisma.user.findUnique({
+        where: {
+          username: userName,
         },
       });
+      if (user) {
+        participants.push(user.id);
+        await this.prisma.groupParticipant.create({
+          data: {
+            chat: {
+              connect: { id: newGroupChat.id },
+            },
+            user: {
+              connect: { id: user.id },
+            },
+          },
+        });
+        await this.prisma.groupParticipant.create({
+          data: {
+            chat: {
+              connect: { id: newGroupChat.id },
+            },
+            user: {
+              connect: { id: user.id },
+            },
+          },
+        });
+      }
     });
 
-    return newGroupChat;
+    return { groupId, participants };
   }
 
   async findChatById(id: number | null) {
@@ -88,8 +107,6 @@ export class ChatService {
     const newMessage = await this.prisma.groupMessage.create({
       data: {
         content: content,
-        chatId: chatId,
-        userId: userId,
         chat: {
           connect: { id: chatId },
         },
@@ -171,8 +188,6 @@ export class ChatService {
   async addUserToChat(chatId: number, userId: number) {
     const chatUser = await this.prisma.groupParticipant.create({
       data: {
-        chatId: chatId,
-        userId: userId,
         chat: {
           connect: { id: chatId },
         },
@@ -285,6 +300,15 @@ export class ChatService {
   }
 
   async unMuteUser(chatId: number, userId: number) {
+    //await this.prisma.ChatStatus.delete({
+    //  where: {
+    //    chatId: chatId,
+    //    userId: userId,
+    //  },
+    //});
+  }
+
+  async unBanUser(chatId: number, userId: number) {
     //await this.prisma.ChatStatus.delete({
     //  where: {
     //    chatId: chatId,

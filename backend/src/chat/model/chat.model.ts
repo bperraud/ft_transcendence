@@ -1,13 +1,11 @@
 export type Chat = {
-  chatUsers: ChatUser[];
-  messages: Message[];
-  createdAt: Date;
   id: number;
-  isGroupChat: boolean;
+
+  createdAt: Date;
+  updatedAt: Date;
   name: string;
   accessibility: string;
   password: string;
-  updatedAt: Date;
 };
 
 export type ChatUser = {
