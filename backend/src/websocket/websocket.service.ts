@@ -68,16 +68,17 @@ export class WebSocketService {
   }
 
   async updateStatusForFriends(userId: number, status: string) {
-    const userFriends = (
-      await this.prisma.user.findUnique({
-        where: { id: userId },
-      })
-    ).friends;
-    userFriends.forEach((friendId: number) => {
-      const friendSocket = this.getSocket(friendId);
-      if (friendSocket) {
-        friendSocket.emit('updateStatus', { friendId: userId, status });
-      }
-    });
+    //const userFriends = (
+    //  await this.prisma.user.findUnique({
+    //    where: { id: userId },
+    //  })
+    //).friends;
+    //userFriends.forEach((friendId: number) => {
+    //  const friendSocket = this.getSocket(friendId);
+    //  if (friendSocket) {
+    //    friendSocket.emit('updateStatus', { friendId: userId, status });
+    //  }
+    //});
+    // TODO
   }
 }

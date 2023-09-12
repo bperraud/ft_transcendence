@@ -19,8 +19,8 @@ export class ChatController {
   @UseGuards(JwtGuard)
   @Get('allUserChats')
   async getAllUserChats(@GetUser() user) {
-    const chats = await this.chatService.getAllUserChats(user.username);
-    return chats;
+    //const chats = await this.chatService.getAllUserChats(user.username);
+    //return chats;
   }
 
   @UseGuards(JwtGuard)

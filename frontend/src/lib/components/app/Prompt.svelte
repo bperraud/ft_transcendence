@@ -1,14 +1,16 @@
 <script lang="ts">
 	import DropDown from '$lib/components/drop/DropDown.svelte';
+	import { writable } from 'svelte/store';
 
 	let input = '';
-	let textareaValue = '';
+
+	let textareaValue = writable('');
 
 	function clear() {
 		input = '';
 	}
 
-	const WEBSERV_BACKEND_URL = 'http://localhost:8080';
+	const WEBSERV_BACKEND_URL = 'http://localhost:8080'; // should be in .env and not on the frontend
 
 	function fetchWithTokenWebServer(route: string, options: RequestInit = {}): Promise<Response> {
 		const res = fetch(`${WEBSERV_BACKEND_URL}/${route}`,  {
@@ -26,7 +28,8 @@
 			method: 'GET'
 		});
 		const data = await res.text();
-		textareaValue = data;
+		$textareaValue = data;
+		console.log(data);
 	}
 
 	let activeDrop: string | null = null;
@@ -50,7 +53,7 @@
 		</DropDown>
 	</div>
 	<div class="content">
-		<textarea bind:value={textareaValue} />
+		<p>{$textareaValue}</p>
 		<input type="text" bind:value={input} class="message-input"/>
 		<button on:click={run_cmd(input)}>Send</button>
 	</div>
@@ -75,7 +78,8 @@
 	div.content {
 		margin-left: 0.2rem;
 		margin-right: 0.2rem;
-		textarea {
+		p {
+			white-space: pre-line;
 			min-height: 80px;
 			min-width: 150px;
 			padding-top: 0.2rem;

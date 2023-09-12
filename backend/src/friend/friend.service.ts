@@ -16,78 +16,90 @@ export class FriendService {
   ) {}
 
   async getFriends(userId: number): Promise<number[]> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+    //const user = await this.prisma.user.findMany({
+    //  where: { id: userId },
+    //});
+    //return user.friends;
+    const friends = await this.prisma.relationship.findMany({
+      where: {
+        AND: [
+          {
+            OR: [{ user1Id: userId }, { user2Id: userId }],
+          },
+          {
+            type: 'friend',
+          },
+        ],
+      },
     });
-    return user.friends;
+    return friends;
   }
 
-  async findFriend(id: number, friendId: number): Promise<boolean> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: id },
+  async isFriendOf(id: number, friendId: number): Promise<boolean> {
+    const friendship = await this.prisma.relationship.findMany({
+      where: {
+        AND: [
+          {
+            OR: [
+              { user1Id: id, user2Id: friendId },
+              { user1Id: friendId, user2Id: id },
+            ],
+          },
+          {
+            type: 'friend',
+          },
+        ],
+      },
     });
-    return user.friends.includes(friendId);
+
+    return friendship == null;
   }
 
   async addFriend(userId: number, friendId: number) {
-    if (await this.findFriend(userId, friendId)) {
+    if (await this.isFriendOf(userId, friendId)) {
       throw new ForbiddenException('User already in friends list');
     }
     try {
-      const user = await this.prisma.user.update({
-        where: { id: userId },
-        data: { friends: { push: friendId } },
-      });
-      const friend = await this.prisma.user.update({
-        where: { id: friendId },
-        data: { friends: { push: user.id } },
-      });
-      if ((await this.userService.getUserStatus(friend.id)) != 'offline') {
-        this.socketService.sendToUser(friendId, user.username, 'friend');
-      }
-      delete user.hash;
-      return user;
+      await this.notifyFriend(friendId);
+      //  delete user.hash;
+      //  return user;
     } catch (error) {
       throw new ForbiddenException('Fail to update in database');
     }
   }
 
+  async notifyFriend(friendId: number) {
+    if ((await this.userService.getUserStatus(friendId)) != 'offline') {
+      this.socketService.sendToUser(friendId, '', 'friend');
+    }
+  }
+
   async removeFriend(userId: number, friendId: number) {
-    if (!(await this.findFriend(userId, friendId))) {
+    if (!(await this.isFriendOf(userId, friendId))) {
       throw new NotFoundException('User not in friends list');
     }
     try {
-      const user = await this.prisma.user.update({
-        where: { id: userId },
-        data: {
-          friends: {
-            set: (
-              await this.prisma.user.findUnique({
-                where: { id: userId },
-                select: { friends: true },
-              })
-            ).friends.filter((id) => id !== friendId),
-          },
+      await this.prisma.relationship.delete({
+        where: {
+          AND: [
+            {
+              OR: [
+                { user1Id: userId, user2Id: friendId },
+                { user1Id: friendId, user2Id: userId },
+              ],
+            },
+            {
+              type: 'friend',
+            },
+          ],
         },
       });
-      const friend = await this.prisma.user.update({
-        where: { id: friendId },
-        data: {
-          friends: {
-            set: (
-              await this.prisma.user.findUnique({
-                where: { id: friendId },
-                select: { friends: true },
-              })
-            ).friends.filter((id) => id !== user.id),
-          },
-        },
-      });
-      if ((await this.userService.getUserStatus(friend.id)) != 'offline') {
-        this.socketService.sendToUser(friendId, user.username, 'friend');
-      }
-      delete user.hash;
-      return user;
+
+      // notify friend
+      await this.notifyFriend(friendId);
+
+      //  delete user.hash;
+      //  return user;
     } catch (error) {
       throw new ForbiddenException('Fail to update in database');
     }

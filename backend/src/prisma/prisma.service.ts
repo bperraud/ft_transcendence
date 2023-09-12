@@ -10,26 +10,26 @@ export class PrismaService extends PrismaClient {
 
   async onModuleInit() {
     await this.$connect();
-    await this.initRoles();
+    //await this.initRoles();
   }
 
-  async initRoles() {
-    const roles: any = [
-      { name: 'Admin' },
-      { name: 'Moderator' },
-      { name: 'User' },
-    ];
+//  async initRoles() {
+//    const roles: any = [
+//      { name: 'Admin' },
+//      { name: 'Moderator' },
+//      { name: 'User' },
+//    ];
 
-    for (const role of roles) {
-      const existingRole = await this.role.findUnique({
-        where: { name: role.name },
-      });
+//    for (const role of roles) {
+//      const existingRole = await this.role.findUnique({
+//        where: { name: role.name },
+//      });
 
-      if (!existingRole) {
-        await this.role.create({ data: role });
-      }
-    }
-  }
+//      if (!existingRole) {
+//        await this.role.create({ data: role });
+//      }
+//    }
+//  }
 
   cleanDb() {
     return this.$transaction([this.stat.deleteMany(), this.user.deleteMany()]);

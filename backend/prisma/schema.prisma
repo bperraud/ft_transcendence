@@ -18,26 +18,18 @@ model User {
   twoFactorEnabled    Boolean        @default(false)
   twoFactorAuthSecret String?
 
-  chatRole            ChatRole[]
   settings            Settings?
   stat                Stat?
-  groupeMessage		  GroupMessage[]
+  chatStatus          ChatStatus[]
+  groupMessage		  GroupMessage[]
+  participant	      GroupParticipant[]
   matchesAsLoser      Match[]         @relation("Loser")
   matchesAsWinner     Match[]         @relation("Winner")
   messagesSend 		  Message[]	      @relation("sender")
   messagesReceived 	  Message[]	      @relation("receiver")
-  source              Relationship[]  @relation("source")
-  destination         Relationship[]  @relation("destination")
-//  statId              Int            @unique
-//  settingsId          Int            @unique
-//  friends             Int[]          @default([])
-//  notifications       Notification[]
-//  mutes               Mute[]
-//  bans                Ban[]
-//  blocks              Block[]        @relation("blockerToBlocks")
-//  messages            Message[]
-//  settings            Settings       @relation(fields: [settingsId], references: [id])
-//  stat                Stat           @relation(fields: [statId], references: [id])
+  source              Relationship[]  @relation("user1")
+  destination         Relationship[]  @relation("user2")
+  notification		  Notification[]
 }
 
 // create table relationship instead with status ( pending, accepted, blocked, mute )
@@ -57,14 +49,25 @@ model Match {
 model Relationship {
   id         Int      @id @default(autoincrement())
   createdAt  DateTime @default(now())
-  userId     Int
   type       String
 
-  userDstId  Int
-  userSrcId  Int
-  userSrc    User     @relation("source", fields: [userSrcId], references: [id])
-  userDst    User     @relation("destination",fields: [userDstId], references: [id])
-  @@unique([userSrcId, userDstId, type])
+  user1Id  	 Int
+  user2Id  	 Int
+  user1      User     @relation("user1", fields: [user1Id], references: [id])
+  user2      User     @relation("user2",fields: [user2Id], references: [id])
+  @@unique([user1Id, user2Id, type])
+}
+
+model Notification {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  senderId   Int
+  senderName String
+  userId     Int
+  type       String
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, senderId, type])
 }
 
 model Stat {
@@ -101,17 +104,26 @@ model Message {
   receiver      User     @relation("receiver", fields: [senderId], references: [id])
 }
 
-model Chat {  		// group chat
+model Chat {  // group chat
 	id            Int        @id @default(autoincrement())
+
 	createdAt     DateTime   @default(now())
 	updatedAt     DateTime   @updatedAt
 	name          String     @unique @db.VarChar(30)
-
 	accessibility String     @default("public")
 	password      String?
 
 	messages      GroupMessage[]
-	restriction   ChatRole[]
+	restriction   ChatStatus[]
+	participant	  GroupParticipant[]
+}
+
+model GroupParticipant {
+	chatId    	  Int
+	userId    	  Int
+	chat          Chat      @relation(fields: [chatId], references: [id])
+	user          User      @relation(fields: [userId], references: [id])
+	@@id([chatId, userId])
 }
 
 model GroupMessage {
@@ -119,24 +131,25 @@ model GroupMessage {
 	createdAt     DateTime   @default(now())
 	updatedAt     DateTime   @updatedAt
 
-	message       String
+	content       String
 	chatId    	  Int
 	userId    	  Int
 	chat          Chat      @relation(fields: [chatId], references: [id])
 	user          User      @relation(fields: [userId], references: [id])
 }
 
-model ChatRole {
+model ChatStatus {
   id        Int        @id @default(autoincrement())
-  createdAt DateTime  @default(now())
+  createdAt DateTime   @default(now())
+  expiresAt DateTime
+  status    String     @default("default") // admin / ban /mute
 
-  type      String	  @default("default")  // admin / ban /mute
   chatId    Int
   userId    Int
-  chat      Chat      @relation(fields: [chatId], references: [id])
-  user      User      @relation(fields: [userId], references: [id])
+  chat      Chat       @relation(fields: [chatId], references: [id])
+  user      User       @relation(fields: [userId], references: [id])
 
-//  @@id([chatId, userId])
+// @@id([chatId, userId])
 }
 
 //model Message {
@@ -148,18 +161,6 @@ model ChatRole {
 //  chatId    Int
 //  chat      Chat     @relation(fields: [chatId], references: [id])
 //  user      User     @relation(fields: [userId], references: [id])
-//}
-
-//model Notification {
-//  id         Int      @id @default(autoincrement())
-//  createdAt  DateTime @default(now())
-//  senderId   Int
-//  senderName String
-//  userId     Int
-//  type       String
-//  user       User     @relation(fields: [userId], references: [id])
-
-//  @@unique([userId, senderId, type])
 //}
 
 //model ChatRole {

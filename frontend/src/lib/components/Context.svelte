@@ -475,8 +475,9 @@
 			DesktopProps: { name: 'EditProfile', icon: '/computer.png' }
 		},
 		Prompt : {
-			TabProps: { name: 'Prompt', icon: '/shell.png' },
+			TabProps: { name: 'Command Prompt', icon: '/shell.png' },
 			DesktopProps: { name: 'Prompt', icon: '/shell.png' }
+
 		},
 		PongKeybinds: {
 			TabProps: { name: 'Keybinds', icon: '/computer.png' },

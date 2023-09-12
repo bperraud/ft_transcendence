@@ -27,7 +27,7 @@ export class NotificationController {
     if (!prisma_friend) throw new NotFoundException('User not found');
     else if (user.id == prisma_friend.id)
       throw new ForbiddenException('You cannot add yourself as a friend');
-    else if (await this.friendService.findFriend(user.id, prisma_friend.id)) {
+    else if (await this.friendService.isFriendOf(user.id, prisma_friend.id)) {
       throw new ForbiddenException('You are already friends');
     }
     return await this.notifService.notifyEvent(prisma_friend, user, 'friend');

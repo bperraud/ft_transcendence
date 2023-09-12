@@ -33,10 +33,8 @@
 
 	let banExpiresAt: Date | null = null;
 	let muteExpiresAt: Date | null = null;
-
 	let banDuration: number | null = null;
 	let muteDuration: number | null = null;
-
 	let actionDuration: number | null = null;
 
 	//PASSWORD
@@ -85,10 +83,10 @@
 
 	const actions = {
 		Moderator: (userId: number) => {
-			changeRole(userId, 2);
+			changeRole(userId, "admin");
 		},
 		User: (userId: number) => {
-			changeRole(userId, 3);
+			changeRole(userId, "user");
 		},
 		ban: (userId: number) => {
 			banUser(userId, actionDuration);
@@ -165,8 +163,8 @@
 		else selectedUser = user;
 	}
 
-	function changeRole(userId: number, newRoleId: number) {
-		$socket.emit('changeRole', { chatId: chatIdLocal, userId, newRoleId });
+	function changeRole(userId: number, newRole: string) {
+		$socket.emit('changeRole', { chatId: chatIdLocal, userId, newRole });
 	}
 
 	function banUser(userId: number, duration: number | null) {
@@ -470,7 +468,7 @@
 			display: flex;
 			flex-direction: column;
 			justify-content: space-between;
-			
+
 			#chat-window {
 				background-color: white;
 				@include tab-border($light-grey, $dark-grey);

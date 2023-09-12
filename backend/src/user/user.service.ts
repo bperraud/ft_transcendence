@@ -95,58 +95,44 @@ export class UserService {
     };
   }
 
-  //  async getQueueUsers() {
-  //    const inqueue = [...this.socketService.getAllStatus().entries()]
-  //      .filter(([_, status]) => status === 'queue')
-  //      .map(([username, _]) => username);
-  //    const users = await this.prisma.user.findMany({
-  //      where: {
-  //        username: {
-  //          in: inqueue,
-  //        },
-  //      },
-  //    });
-  //    return users;
-  //  }
-
   getStatus(userId: number) {
     return this.socketService.getStatus(userId);
   }
 
   async getUserBlocks(username: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { username: username },
-      include: { blocks: true },
-    });
-    return user.blocks;
+    //const user = await this.prisma.user.findUnique({
+    //  where: { username: username },
+    //  include: { blocks: true },
+    //});
+    //return user.blocks;
   }
 
   async blockUser(userId: number, blockedId: number) {
-    const existingBlock = await this.prisma.block.findFirst({
-      where: {
-        blockerId: userId,
-        blockedId: blockedId,
-      },
-    });
-    if (existingBlock) return false;
-    return this.prisma.block.create({
-      data: {
-        blockerId: userId,
-        blockedId: blockedId,
-      },
-    });
+    //const existingBlock = await this.prisma.block.findFirst({
+    //  where: {
+    //    blockerId: userId,
+    //    blockedId: blockedId,
+    //  },
+    //});
+    //if (existingBlock) return false;
+    //return this.prisma.block.create({
+    //  data: {
+    //    blockerId: userId,
+    //    blockedId: blockedId,
+    //  },
+    //});
   }
 
   async unblockUser(userId: number, blockedId: number) {
-    const existingBlock = await this.prisma.block.findFirst({
-      where: {
-        blockerId: userId,
-        blockedId: blockedId,
-      },
-    });
-    if (!existingBlock) return false;
-    return this.prisma.block.delete({
-      where: { id: existingBlock.id },
-    });
+    //const existingBlock = await this.prisma.block.findFirst({
+    //  where: {
+    //    blockerId: userId,
+    //    blockedId: blockedId,
+    //  },
+    //});
+    //if (!existingBlock) return false;
+    //return this.prisma.block.delete({
+    //  where: { id: existingBlock.id },
+    //});
   }
 }
