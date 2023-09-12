@@ -73,6 +73,8 @@ export class PongGateway extends SocketGateway {
       {
         result: Math.abs(winner - 1),
         opponentId: this.webSocketService.getClientId(game.getPlayer2()),
+        score1: game.getScorePlayer1(),
+        score2: game.getScorePlayer2(),
       },
     );
   }

@@ -33,15 +33,12 @@ export class NotificationService {
               id: prisma_friend.id,
             },
           },
-          senderId: user.id,
-          senderName: user.username,
+          sender: {
+            connect: {
+              id: user.id,
+            },
+          },
           type: message,
-        },
-      });
-      await this.prisma.user.update({
-        where: { username: prisma_friend.username },
-        data: {
-          notifications: { connect: { id: notif.id } },
         },
       });
       if (

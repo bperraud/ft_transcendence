@@ -15,7 +15,8 @@ export class FriendService {
     private userService: UserService,
   ) {}
 
-  async getFriends(userId: number): Promise<number[]> {
+  //  async getFriends(userId: number): Promise<number[]> {
+  async getFriends(userId: number) {
     //const user = await this.prisma.user.findMany({
     //  where: { id: userId },
     //});
@@ -79,7 +80,7 @@ export class FriendService {
       throw new NotFoundException('User not in friends list');
     }
     try {
-      await this.prisma.relationship.delete({
+      await this.prisma.relationship.deleteMany({
         where: {
           AND: [
             {

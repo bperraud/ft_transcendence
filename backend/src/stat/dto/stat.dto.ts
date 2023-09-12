@@ -8,4 +8,10 @@ export class UpdateStatDto {
   @IsString()
   @IsNotEmpty()
   opponentId: number;
+
+  @IsNumber()
+  score1: number;
+
+  @IsNumber()
+  score2: number;
 }

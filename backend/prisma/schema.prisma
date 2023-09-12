@@ -29,7 +29,9 @@ model User {
   messagesReceived 	  Message[]	      @relation("receiver")
   source              Relationship[]  @relation("user1")
   destination         Relationship[]  @relation("user2")
-  notification		  Notification[]
+  userNotif		      Notification[]  @relation("user")
+  senderNotif		  Notification[]  @relation("sender")
+
 }
 
 // create table relationship instead with status ( pending, accepted, blocked, mute )
@@ -61,12 +63,12 @@ model Relationship {
 model Notification {
   id         Int      @id @default(autoincrement())
   createdAt  DateTime @default(now())
-  senderId   Int
-  senderName String
-  userId     Int
   type       String
-  user       User     @relation(fields: [userId], references: [id])
 
+  senderId   Int
+  userId     Int
+  user       User     @relation("user", fields: [userId], references: [id])
+  sender     User     @relation("sender", fields: [senderId], references: [id])
   @@unique([userId, senderId, type])
 }
 

@@ -56,12 +56,9 @@ export class NotificationController {
 
   @Get('get')
   async getNotification(@GetUser('id') id, @Query('type') type: string) {
-    const prisma_user = await this.prisma.user.findUnique({
-      where: { id: id },
-      include: { notifications: true },
+    const notif = await this.prisma.notification.findMany({
+      where: { userId: id, type: type },
     });
-    if (!prisma_user) throw new NotFoundException('User not found');
-    const notif = prisma_user.notifications;
-    return notif.filter((notif) => notif.type == type);
+    return notif;
   }
 }

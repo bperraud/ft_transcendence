@@ -113,6 +113,14 @@ export class PongGame {
     return this.player2;
   }
 
+  getScorePlayer1() {
+    return this.state.player1Score;
+  }
+
+  getScorePlayer2() {
+    return this.state.player2Score;
+  }
+
   handleInput(input: Input) {
     if (this.player1 !== null && input.clientId === this.player1.id) {
       this.inputs1.push(input);

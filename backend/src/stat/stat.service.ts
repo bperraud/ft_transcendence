@@ -42,10 +42,26 @@ export class StatService {
     playerA.stat.ladder = this.updateLadder(playerA.stat.elo);
     playerB.stat.ladder = this.updateLadder(playerB.stat.elo);
 
+    let winnerId: number;
+    let loserId: number;
+    let scoreLoser: number;
+    let scoreWinner: number;
     if (dto.result === 1) {
+      [winnerId, loserId, scoreWinner, scoreLoser] = [
+        playerA.id,
+        playerB.id,
+        dto.score1,
+        dto.score2,
+      ];
       playerA.stat.wins += 1;
       playerB.stat.losses += 1;
     } else {
+      [winnerId, loserId, scoreWinner, scoreLoser] = [
+        playerB.id,
+        playerA.id,
+        dto.score2,
+        dto.score1,
+      ];
       playerA.stat.losses += 1;
       playerB.stat.wins += 1;
     }
@@ -62,22 +78,31 @@ export class StatService {
       },
     });
 
-    const winnerName = dto.result === 1 ? playerA.username : playerB.username;
-    const loserName = dto.result === 1 ? playerB.username : playerA.username;
+    //const winnerId = dto.result === 1 ? playerA.id : playerB.id;
+    //const loserId = dto.result === 1 ? playerB.id : playerA.id;
+
     const match = await this.prisma.match.create({
       data: {
-        winnerName: winnerName,
-        loserName: loserName,
+        scoreWinner: scoreWinner,
+        scoreLoser: scoreLoser,
+        winner: {
+          connect: { id: winnerId },
+        },
+        loser: {
+          connect: { id: loserId },
+        },
       },
     });
-    await this.prisma.user.update({
-      where: { username: winnerName },
-      data: { matchesAsWinner: { connect: { id: match.id } } },
-    });
-    await this.prisma.user.update({
-      where: { username: loserName },
-      data: { matchesAsLoser: { connect: { id: match.id } } },
-    });
+
+    //await this.prisma.user.update({
+    //  where: { username: winnerName },
+    //  data: { matchesAsWinner: { connect: { id: match.id } } },
+    //});
+    //await this.prisma.user.update({
+    //  where: { username: loserName },
+    //  data: { matchesAsLoser: { connect: { id: match.id } } },
+    //});
+
     return match;
   }
 
