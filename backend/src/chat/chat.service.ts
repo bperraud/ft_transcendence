@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Chat, Message } from '../chat/model/chat.model';
+import { Chat, GroupMessage, Message } from '../chat/model/chat.model';
 
 @Injectable()
 export class ChatService {
@@ -98,12 +98,32 @@ export class ChatService {
     return chat;
   }
 
-  // addNewMessage
   async addMessageToDatabase(
+    content: string,
+    userId: number,
+    friendId: number,
+  ): Promise<Message> {
+    const newMessage = await this.prisma.message.create({
+      data: {
+        content: content,
+        sender: {
+          connect: { id: userId },
+        },
+        receiver: {
+          connect: { id: friendId },
+        },
+        createdAt: new Date(),
+      },
+    });
+    return newMessage;
+  }
+
+  // addNewMessage
+  async addGroupMessageToDatabase(
     chatId: number,
     content: string,
     userId: number,
-  ): Promise<Message> {
+  ): Promise<GroupMessage> {
     const newMessage = await this.prisma.groupMessage.create({
       data: {
         content: content,
@@ -121,16 +141,6 @@ export class ChatService {
     });
     return newMessage;
   }
-
-  //  async leaveGroup(chatName: string, userId: number): Promise<any> {
-  //    const result = await this.prisma.groupParticipant.deleteMany({
-  //      where: {
-  //        name: chatName,
-  //        userId: userId,
-  //      },
-  //    });
-  //    return result;
-  //  }
 
   async leaveGroup(chatId: number, userId: number): Promise<any> {
     const result = await this.prisma.groupParticipant.deleteMany({

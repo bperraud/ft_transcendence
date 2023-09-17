@@ -24,7 +24,7 @@
 	let isFriend = true;
 	let chatWindow: HTMLDivElement;
 	let autoScroll = true;
-	let isCreatingChat = false;
+	//let isCreatingChat = false;
 	let blockedIds: number[];
 	let noMember = false;
 
@@ -84,9 +84,9 @@
 
 	async function sendMessage() {
 		if (messageContent.trim() === '') return;
-		if (isCreatingChat) return;
+		//if (isCreatingChat) return;
 		if (!chatIdLocal) {
-			isCreatingChat = true;
+			//isCreatingChat = true;
 
 			const memberUsernames = [$user?.username, friendUsername];
 			const groupName = memberUsernames.join('-');
@@ -99,7 +99,7 @@
 				$socket.emit('otherAddChat', { chat: chat, userId: $user?.id });
 				$socket.emit('otherAddChat', { chat: chat, userId: friendId });
 			}
-			isCreatingChat = false;
+			//isCreatingChat = false;
 		}
 		$socket.emit('sendMessage', {
 			chatId: chatIdLocal,
@@ -137,7 +137,7 @@
 							</div>
 							<div class="message-content">{message.content}</div>
 							<h6 class="clock">
-								{#if (i !== currentChat?.messages.length - 1 
+								{#if (i !== currentChat?.messages.length - 1
 									&& formatter.format(new Date(currentChat?.messages[i + 1].createdAt)) !== formatter.format(new Date(currentChat?.messages[i].createdAt)))
 									|| i === currentChat?.messages.length - 1}
 									{formatter.format(new Date(message.createdAt))}
@@ -207,13 +207,13 @@
 		order: 1;
 		outline: none;
 	}
-	
+
 	ul {
 		list-style: none;
 		display: flex;
 		flex-direction: column;
 	}
-	
+
 	li {
 		margin-bottom: 0.25rem;
 		word-break: break-word;
@@ -233,7 +233,7 @@
 		}
 		color: white;
 	}
-	
+
 	li.self .message-header,
 	li.self .message-content {
 		margin-top: 0.1rem;

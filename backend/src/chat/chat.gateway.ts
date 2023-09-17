@@ -10,6 +10,7 @@ import { ChatService } from './chat.service';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 import { WebSocketService } from 'src/websocket/websocket.service';
+import { add } from 'pactum/src/exports/reporter';
 
 @WebSocketGateway({
   cors: {
@@ -74,53 +75,67 @@ export class ChatGateway extends SocketGateway {
     }
   }
 
-  @SubscribeMessage('sendMessage')
-  async handleMessage(
+  @SubscribeMessage('sendGroupMessage')
+  async handleGroupMessage(
     client: Socket,
-    payload: { chatId: number; content: string; friendId?: number },
+    payload: { content: string; chatId: number },
   ) {
     const chat = await this.chatService.findChatById(payload.chatId);
     const userId = this.webSocketService.getClientId(client);
     const user = await this.userService.getUserById(userId);
 
-    const otherChatUser = chat
-      ? chat.chatUsers.find((c) => (c as any).user.id !== userId)
-      : null;
-    const socket = this.webSocketService.getSocket(
-      otherChatUser ? (otherChatUser as any).user.id : payload.friendId,
-    );
+    //const otherChatUser = chat
+    //  ? chat.chatUsers.find((c) => (c as any).user.id !== userId)
+    //  : null;
+    //const socket = this.webSocketService.getSocket(
+    //  otherChatUser ? (otherChatUser as any).user.id : payload.friendId,
+    //);
 
     const sendMessage = async () => {
-      const newMessage = await this.chatService.addMessageToDatabase(
+      const newMessage = await this.chatService.addGroupMessageToDatabase(
         chat.id,
         payload.content,
         user.id,
       );
       this.chatService.updateLastMessageRead(chat.id, newMessage.id, user.id);
-      if (chat.isGroupChat) {
-        this.server
-          .to(`chat-${payload.chatId}`)
-          .emit('message', { chatId: chat.id, message: newMessage });
-      } else {
-        client.emit('message', { chatId: chat.id, message: newMessage });
-        if (socket)
-          socket.emit('message', { chatId: chat.id, message: newMessage });
-      }
+      this.server
+        .to(`chat-${payload.chatId}`)
+        .emit('message', { chatId: chat.id, message: newMessage });
     };
 
-    if (
-      chat.chatUsers &&
-      !chat.chatUsers.find((c) => (c as any).user.id === user.id)
-    ) {
-      const chatUser = await this.chatService.addUserToChat(chat.id, user.id);
-      const newchat = await this.chatService.findChatById(chat.id);
-      client.join(`chat-${chat.id}`);
-      this.server
-        .to(`chat-${chat.id}`)
-        .emit('chatUserAdded', { chatId: chat.id, chatUser });
-      client.emit('addChat', newchat);
-    }
+    //if (
+    //  chat.chatUsers &&
+    //  !chat.chatUsers.find((c) => (c as any).user.id === user.id)
+    //) {
+    //  const chatUser = await this.chatService.addUserToChat(chat.id, user.id);
+    //  const newchat = await this.chatService.findChatById(chat.id);
+    //  client.join(`chat-${chat.id}`);
+    //  this.server
+    //    .to(`chat-${chat.id}`)
+    //    .emit('chatUserAdded', { chatId: chat.id, chatUser });
+    //  client.emit('addChat', newchat);
+    //}
     await sendMessage();
+  }
+
+  @SubscribeMessage('sendMessage')
+  async handleMessage(
+    client: Socket,
+    payload: { content: string; friendId: number },
+  ) {
+    const userId = this.webSocketService.getClientId(client);
+
+    const newMessage = await this.chatService.addMessageToDatabase(
+      payload.content,
+      userId,
+      payload.friendId,
+    );
+
+    const socket = this.webSocketService.getSocket(payload.friendId);
+
+    //client.emit('message', { chatId: chat.id, message: newMessage });
+    //if (socket)
+    //  socket.emit('message', { chatId: chat.id, message: newMessage });
   }
 
   @SubscribeMessage('leaveGroup')

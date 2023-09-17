@@ -1,3 +1,5 @@
+//import { type } from "os";
+
 export type Chat = {
   id: number;
 
@@ -20,10 +22,19 @@ export type ChatUser = {
 export type Message = {
   id: number;
   createdAt: Date; // Change this from string to Date
-  updatedAt: Date; // Likely need to change this too
+  //  updatedAt: Date; // Likely need to change this too
+  content: string;
+  senderId: number;
+  receiverId: number;
+};
+
+export type GroupMessage = {
+  id: number;
+  createdAt: Date; // Change this from string to Date
+  //  updatedAt: Date; // Likely need to change this too
+  content: string;
   userId: number;
   chatId: number;
-  content: string;
 };
 
 export type User = {
