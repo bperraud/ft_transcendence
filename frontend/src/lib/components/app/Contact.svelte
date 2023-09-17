@@ -22,14 +22,12 @@
 	const startChat = Context.startChat();
 
 	let selectedFriends: Context.Contact[] = [];
-
 	let friendInput: string = '';
 	let groupChatMode = false;
-
-	fetchFriends();
-
 	let errorMessage: string | null = null;
 	let showModal = false;
+
+	fetchFriends();
 
 	async function addFriend(event: Event) {
 		const form = (event.target as HTMLFormElement).friend.value;
@@ -72,7 +70,6 @@
 			selectedFriends = [...selectedFriends.slice(0, index), ...selectedFriends.slice(index + 1)];
 		else selectedFriends = [...selectedFriends, friend];
 	}
-
 
 	async function createGroupChat() {
 		const memberUsernames = selectedFriends.map(friend => friend.username);

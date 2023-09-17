@@ -25,9 +25,7 @@ export class FriendController {
 
   @Get('me')
   async getUserFriends(@GetUser() user) {
-    const friends = (await this.prisma.user.findMany({
-      where: { id: { in: user.friends } },
-    })) as any;
+    const friends = (await this.friendService.getFriends(user.id)) as any;
     friends.forEach((friend) => {
       friend.status = this.userService.getStatus(friend.id);
     });

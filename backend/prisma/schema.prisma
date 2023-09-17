@@ -31,7 +31,6 @@ model User {
   destination         Relationship[]  @relation("user2")
   userNotif		      Notification[]  @relation("user")
   senderNotif		  Notification[]  @relation("sender")
-
 }
 
 // create table relationship instead with status ( pending, accepted, blocked, mute )

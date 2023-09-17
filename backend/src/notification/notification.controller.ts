@@ -30,7 +30,11 @@ export class NotificationController {
     else if (await this.friendService.isFriendOf(user.id, prisma_friend.id)) {
       throw new ForbiddenException('You are already friends');
     }
-    return await this.notifService.notifyEvent(prisma_friend, user, 'friend');
+    return await this.notifService.notifyEvent(
+      prisma_friend.id,
+      user.id,
+      'friend',
+    );
   }
 
   @Post('friend-response')

@@ -17,10 +17,6 @@ export class FriendService {
 
   //  async getFriends(userId: number): Promise<number[]> {
   async getFriends(userId: number) {
-    //const user = await this.prisma.user.findMany({
-    //  where: { id: userId },
-    //});
-    //return user.friends;
     const friends = await this.prisma.relationship.findMany({
       where: {
         AND: [

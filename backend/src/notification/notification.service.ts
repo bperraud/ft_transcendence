@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { WebSocketService } from 'src/websocket/websocket.service';
 import { UserService } from 'src/user/user.service';
-import { User } from '@prisma/client';
 
 @Injectable()
 export class NotificationService {
@@ -12,13 +11,13 @@ export class NotificationService {
     private userService: UserService,
   ) {}
 
-  async notifyEvent(prisma_friend: User, user: User, message: string) {
+  async notifyEvent(friendId: number, userId: number, message: string) {
     try {
       const firstNotif = await this.prisma.notification.findFirst({
         where: {
-          senderId: user.id,
+          senderId: userId,
           type: message,
-          userId: prisma_friend.id,
+          userId: friendId,
         },
       });
       if (firstNotif) {
@@ -30,21 +29,19 @@ export class NotificationService {
         data: {
           user: {
             connect: {
-              id: prisma_friend.id,
+              id: friendId,
             },
           },
           sender: {
             connect: {
-              id: user.id,
+              id: userId,
             },
           },
           type: message,
         },
       });
-      if (
-        (await this.userService.getUserStatus(prisma_friend.id)) != 'offline'
-      ) {
-        this.socketService.sendToUser(prisma_friend.id, user.username, message);
+      if ((await this.userService.getUserStatus(friendId)) != 'offline') {
+        this.socketService.sendToUser(friendId, '', message);
       }
       return notif;
     } catch (error) {
