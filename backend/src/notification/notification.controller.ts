@@ -60,9 +60,18 @@ export class NotificationController {
 
   @Get('get')
   async getNotification(@GetUser('id') id, @Query('type') type: string) {
-    const notif = await this.prisma.notification.findMany({
+    const notifications = await this.prisma.notification.findMany({
       where: { userId: id, type: type },
     });
-    return notif;
+    const notificationsWithSenderName = await Promise.all(
+      notifications.map(async (notification) => {
+        const user = await this.prisma.user.findUnique({
+          where: { id: notification.userId },
+          select: { username: true },
+        });
+        return { ...notification, senderName: user.username };
+      }),
+    );
+    return notificationsWithSenderName;
   }
 }

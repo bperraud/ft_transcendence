@@ -578,6 +578,7 @@
 		const res = await fetchWithToken('notification/get?type=friend');
 		const data = await res.json();
 		$friendRequest = data;
+		console.log(data);
 		return data;
 	}
 

@@ -30,6 +30,8 @@
 	}
 
 	const friendRequest = Context.friendRequest();
+	console.log("friendRequest");
+	console.log($friendRequest);
 	fetchFriendRequest();
 
 </script>
