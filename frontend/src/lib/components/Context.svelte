@@ -564,6 +564,7 @@
 		const res = await fetchWithToken('friend/me');
 		const data = await res.json();
 		$contacts = data;
+		console.log(data);
 		return data;
 	}
 

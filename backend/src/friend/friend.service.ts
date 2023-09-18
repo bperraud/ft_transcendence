@@ -58,8 +58,17 @@ export class FriendService {
     }
     try {
       await this.notifyFriend(friendId);
-      //  delete user.hash;
-      //  return user;
+      await this.prisma.relationship.create({
+        data: {
+          user1: {
+            connect: { id: userId },
+          },
+          user2: {
+            connect: { id: friendId },
+          },
+          type: 'friend',
+        },
+      });
     } catch (error) {
       throw new ForbiddenException('Fail to update in database');
     }

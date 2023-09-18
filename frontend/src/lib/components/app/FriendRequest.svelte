@@ -11,14 +11,13 @@
 
 	async function answerFriendRequest(requestId: number | undefined, response: boolean) {
 		if (requestId === undefined) requestId = $friendRequest[0].senderId;
-		const res = await fetchWithToken('notification/friend-response', {
+		await fetchWithToken('notification/friend-response', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({ friendId: requestId, response: response })
 		});
-		await res.json();
 		fetchFriendRequest();
 		fetchFriends();
 		fetchMe();
@@ -30,8 +29,6 @@
 	}
 
 	const friendRequest = Context.friendRequest();
-	console.log("friendRequest");
-	console.log($friendRequest);
 	fetchFriendRequest();
 
 </script>

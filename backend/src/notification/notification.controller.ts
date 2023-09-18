@@ -41,7 +41,8 @@ export class NotificationController {
   async responseFriend(@GetUser('id') id, @Body() dto: ResponseDto) {
     await this.notifService.removeNotification(id, dto.friendId, 'friend');
     if (dto.response) {
-      return await this.friendService.addFriend(id, dto.friendId);
+      await this.friendService.addFriend(id, dto.friendId);
+      return { message: 'accepted' };
     }
     return { message: 'declined' };
   }
