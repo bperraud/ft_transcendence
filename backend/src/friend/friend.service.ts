@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { WebSocketService } from '../websocket/websocket.service';
 import { UserService } from '../user/user.service';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class FriendService {
@@ -15,21 +16,17 @@ export class FriendService {
     private userService: UserService,
   ) {}
 
-  //  async getFriends(userId: number): Promise<number[]> {
   async getFriends(userId: number) {
-    const friends = await this.prisma.relationship.findMany({
-      where: {
-        AND: [
-          {
-            OR: [{ user1Id: userId }, { user2Id: userId }],
-          },
-          {
-            type: 'friend',
-          },
-        ],
-      },
-    });
-    return friends;
+    try {
+      const friends = await this.prisma.$queryRaw<
+        User[]
+      >`SELECT id, username FROM "public"."User" WHERE id IN (
+		SELECT "user1Id" FROM "public"."Relationship" WHERE "user2Id" = ${userId} UNION SELECT "user2Id" FROM "public"."Relationship" WHERE "user1Id" = ${userId}
+	  )`;
+      return friends;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async isFriendOf(id: number, friendId: number): Promise<boolean> {
@@ -48,8 +45,7 @@ export class FriendService {
         ],
       },
     });
-
-    return friendship == null;
+    return friendship.length > 0;
   }
 
   async addFriend(userId: number, friendId: number) {
@@ -102,10 +98,8 @@ export class FriendService {
       });
 
       // notify friend
-      await this.notifyFriend(friendId);
-
-      //  delete user.hash;
-      //  return user;
+      //  await this.notifyFriend(friendId);
+      this.notifyFriend(friendId);
     } catch (error) {
       throw new ForbiddenException('Fail to update in database');
     }

@@ -24,12 +24,10 @@ export class FriendController {
   ) {}
 
   @Get('me')
-  async getUserFriends(@GetUser() user) {
-    const friends = (await this.friendService.getFriends(user.id)) as any;
+  async getUserFriends(@GetUser('id') id) {
+    const friends = (await this.friendService.getFriends(id)) as any;
     for (const friend of friends) {
       friend.status = this.userService.getStatus(friend.id);
-      const my_friend = await this.userService.getUserById(friend.id);
-      friend.username = my_friend.username;
     }
     return friends;
   }

@@ -47,13 +47,12 @@
 	}
 
 	async function removeFriend(friendId: number) {
-		const res = await fetchWithToken(`friend/remove/${friendId}`, {
+		await fetchWithToken(`friend/remove/${friendId}`, {
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json'
 			}
 		});
-		await res.json();
 		fetchFriends();
 		fetchMe();
 	}
