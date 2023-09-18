@@ -27,14 +27,20 @@
 			blockedId: number;
 		}
 
-		export type NotifRequest = {
-			id: number;
-			createdAt: string;
-			senderId: number;
-			senderName: string;
-			user: User;
-			userId: number;
-		};
+		//export type NotifRequest = {
+		//	id: number;
+		//	createdAt: string;
+		//	senderId: number;
+		//	senderName: string;
+		//	user: User;
+		//	userId: number;
+		//};
+
+
+		//export type NotifRequest = {
+		//	id: number;
+		//	username: string;
+		//};
 
 		export type Chat = {
 			chatUsers: ChatUser[];
@@ -81,7 +87,7 @@
 
 		export const contacts = (): Writable<Contact[]> => getContext('contacts');
 		export const blocks = (): Writable<Block[]> => getContext('blocks');
-		export const friendRequest = (): Writable<NotifRequest[]> => getContext('friendRequest');
+		export const friendRequest = (): Writable<User[]> => getContext('friendRequest');
 		export const gameRequest = (): Writable<{ id: number; username: string }[]> =>
 			getContext('gameRequest');
 		export const history = (): Writable<Match[]> => getContext('history');

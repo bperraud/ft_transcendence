@@ -8,6 +8,7 @@ import { NotificationService } from './notification.service';
 import { ResponseDto } from './dto';
 import { WebSocketService } from 'src/websocket/websocket.service';
 import { FriendService } from 'src/friend/friend.service';
+import { User } from '@prisma/client';
 
 @UseGuards(JwtGuard)
 @Controller('notification')
@@ -61,18 +62,19 @@ export class NotificationController {
 
   @Get('get')
   async getNotification(@GetUser('id') id, @Query('type') type: string) {
-    const notifications = await this.prisma.notification.findMany({
-      where: { userId: id, type: type },
-    });
-    const notificationsWithSenderName = await Promise.all(
-      notifications.map(async (notification) => {
-        const user = await this.prisma.user.findUnique({
-          where: { id: notification.userId },
-          select: { username: true },
-        });
-        return { ...notification, senderName: user.username };
-      }),
-    );
-    return notificationsWithSenderName;
+    try {
+      const notificationUser = await this.prisma.$queryRaw<
+        User[]
+      >`SELECT id, username FROM "public"."User" WHERE id IN (
+		  SELECT "senderId" FROM "public"."Notification" WHERE "userId" = ${id}
+		  AND type = ${type}
+		)`;
+
+      console.log('notificationUser');
+      console.log(notificationUser);
+      return notificationUser;
+    } catch (error) {
+      throw error;
+    }
   }
 }

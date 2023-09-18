@@ -7,10 +7,10 @@
 	const fetchMe = Context.fetchMe();
 	const addInstance = Context.addInstance();
 
-	let currentRequest: Context.NotifRequest | null = null;
+	let currentRequest: Context.User | null = null;
 
 	async function answerFriendRequest(requestId: number | undefined, response: boolean) {
-		if (requestId === undefined) requestId = $friendRequest[0].senderId;
+		if (requestId === undefined) requestId = $friendRequest[0].id;
 		await fetchWithToken('notification/friend-response', {
 			method: 'POST',
 			headers: {
@@ -24,7 +24,7 @@
 	}
 
 	function checkProfile (userId: number | undefined) {
-		if (userId === undefined) userId = $friendRequest[0].userId;
+		if (userId === undefined) userId = $friendRequest[0].id;
 		addInstance('Profile', {}, { userId: userId });
 	}
 
@@ -52,16 +52,16 @@
 								class={currentRequest === request ? 'highlighted' : ''}
 								on:click={() => (currentRequest = request)}
 							>
-							<td>{request.senderName}</td>
+							<td>{request.username}</td>
 						</tr>
 					{/each}
 				</tbody>
 			</table>
 	</div>
 		<div class="buttons">
-			<button on:click={() => answerFriendRequest(currentRequest?.senderId, true)}>Accept</button>
-			<button on:click={() => answerFriendRequest(currentRequest?.senderId, false)}>Refuse</button>
-			<button on:click={() => checkProfile(currentRequest?.senderId) }>Check Profile</button>
+			<button on:click={() => answerFriendRequest(currentRequest?.id, true)}>Accept</button>
+			<button on:click={() => answerFriendRequest(currentRequest?.id, false)}>Refuse</button>
+			<button on:click={() => checkProfile(currentRequest?.id) }>Check Profile</button>
 		</div>
 	{/if}
 </div>
