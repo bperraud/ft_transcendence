@@ -69,9 +69,6 @@ export class NotificationController {
 		  SELECT "senderId" FROM "public"."Notification" WHERE "userId" = ${id}
 		  AND type = ${type}
 		)`;
-
-      console.log('notificationUser');
-      console.log(notificationUser);
       return notificationUser;
     } catch (error) {
       throw error;
