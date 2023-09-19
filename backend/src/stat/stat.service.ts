@@ -78,9 +78,6 @@ export class StatService {
       },
     });
 
-    //const winnerId = dto.result === 1 ? playerA.id : playerB.id;
-    //const loserId = dto.result === 1 ? playerB.id : playerA.id;
-
     const match = await this.prisma.match.create({
       data: {
         scoreWinner: scoreWinner,
@@ -94,34 +91,19 @@ export class StatService {
       },
     });
 
-    //await this.prisma.user.update({
-    //  where: { username: winnerName },
-    //  data: { matchesAsWinner: { connect: { id: match.id } } },
-    //});
-    //await this.prisma.user.update({
-    //  where: { username: loserName },
-    //  data: { matchesAsLoser: { connect: { id: match.id } } },
-    //});
-
     return match;
   }
 
   async getHistory(playerId: number) {
     try {
-      const user = await this.prisma.user.findUnique({
-        where: { id: playerId },
-        include: {
-          matchesAsWinner: true,
-          matchesAsLoser: true,
-        },
-      });
-      // Merge the matches from both arrays into a single array
-      const allMatches = [...user.matchesAsWinner, ...user.matchesAsLoser];
-      // Sort the matches by date in descending order
-      const sortedMatches = allMatches.sort(
-        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-      );
-      return sortedMatches;
+      const history = await this.prisma.$queryRaw<
+        any[]
+      >`SELECT m."winnerId", u.username, m."createdAt"
+		 FROM "public"."User" AS u
+		 JOIN "public"."Match" As m ON "loserId" = u.id OR "winnerId" = u.id
+		 WHERE u.id != ${playerId}
+		 ORDER BY m."createdAt" DESC`;
+      return history;
     } catch (error) {
       throw new NotFoundException('Error retrieving matches');
     }

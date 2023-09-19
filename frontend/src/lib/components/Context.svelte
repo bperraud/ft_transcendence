@@ -16,11 +16,13 @@
 			opponent: string;
 			createdAt: string;
 		};
+
 		export interface Contact {
 			id: number;
 			username: string;
 			status: string;
 		}
+
 		export interface Block {
 			id: number;
 			blockerId: number;
@@ -316,7 +318,7 @@
 
 	const contacts = writable<Context.Contact[]>([]);
 	const blocks = writable<Context.Block[]>([]);
-	const friendRequest = writable<Context.NotifRequest[]>([]);
+	const friendRequest = writable<Context.User[]>([]);
 	const gameRequest = writable<{ id: number; username: string }[]>([]);
 	const history = writable<Context.Match[]>([]);
 	const statistics = writable<Context.Stat>();
@@ -595,8 +597,8 @@
 		data.forEach(function (element: any, index: number) {
 			const createdAtDate = new Date(element.createdAt);
 			data[index] = {
-				result: $user?.username === element.winnerName ? 'Win' : 'Lose',
-				opponent: $user?.username === element.winnerName ? element.loserName : element.winnerName,
+				result: $user?.id === element.winnerId ? 'Win' : 'Lose',
+				opponent: element.username,
 				createdAt: createdAtDate.toLocaleDateString('en', {
 					day: '2-digit',
 					month: '2-digit',
