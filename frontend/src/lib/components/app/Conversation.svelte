@@ -6,10 +6,7 @@
 	import NotificationBadge from '$lib/components/NotificationBadge.svelte';
 
 	const chats = Context.chats();
-	const chatId = Context.chatId();
 	const blocks = Context.blocks();
-	const friendInfoId = Context.friendInfoId();
-	const openChatWindow = Context.openChatWindow();
 	const getUnreadMessagesCount = Context.getUnreadMessagesCount();
 	let now = new Date();
 	let blockedIds = writable<number[]>([]);
@@ -26,11 +23,6 @@
 		clearInterval(intervalId);
 	});
 
-	function startChat(chatNumber: number, chat: any) {
-		$chatId = chatNumber;
-		$friendInfoId = chat.chatUsers.find((c: any) => c.userId !== $user?.id)?.user?.id;
-		$openChatWindow = true;
-	}
 
 	function getLastMessageSender(chat: any) {
 		if (chat.messages.length > 0) {
@@ -70,7 +62,8 @@
 			return dateB.getTime() - dateA.getTime();
 		}) as chat, i (i)}
 			{#if chat.accessibility === 'private'}
-				<div class="chat" on:click={() => startChat(chat.id, chat)}>
+			<!--addInstance('Chat', {}, { friendId: friend.id })-->
+				<div class="chat" on:click={() => chat }>
 					<div class="chat-header">
 						{#if chat.isGroupChat}
 							<h4>

@@ -6,13 +6,11 @@
 
 	const fetchWithToken = Context.fetchWithToken();
 	const fetchMe = Context.fetchMe();
-	const openEditProfile = Context.openEditProfile();
 	const blocks = Context.blocks();
 	const friends = Context.contacts();
 	const addInstance = Context.addInstance();
 	const selected = Context.selected();
 	const askGame = Context.askGame();
-	const startChat = Context.startChat();
 
 	export let userId: number | null = null;
 
@@ -123,12 +121,12 @@
 			</div>
 		</div>
 		{#if isUser}
-			<button class="button-alone" type="button" on:click={() => ($openEditProfile = true)}>Edit Profile</button>
+			<button class="button-alone" type="button" on:click={() => addInstance('EditProfile')}>Edit Profile</button>
 		{:else if $blocks.some((block) => block.blockedId === $currentUser?.id)}
 			<button class="button-alone" type="button" on:click={() => unblockUser($currentUser.id)}>UnBlock</button>
 		{:else}
 			<div class="buttons">
-				<button type="button" on:click={() => startChat($currentUser)}>Open chat</button>
+				<button type="button" on:click={() => addInstance('Chat', {}, { friendId: $currentUser.id })}>Open chat</button>
 				<button type="button" on:click={() => askGame($currentUser.id)}>Ask game</button>
 				<button type="button" on:click={() => blockUser($currentUser.id)}>Block</button>
 			</div>

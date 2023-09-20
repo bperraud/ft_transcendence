@@ -16,7 +16,6 @@
 	let chatIdLocal: number | null = $chatId;
 	let currentChat: Context.Message[];
 	let friendUsername: string | null | undefined = '';
-	let friendId: number | null = $friendInfoId;
 	let messageContent = '';
 	let chatWindow: HTMLDivElement;
 	let autoScroll = true;
@@ -24,19 +23,21 @@
 	let blockedIds: number[];
 	let noMember = false;
 
+	export let friendId: number | null = null;
+
+
 	$: {
 		blockedIds = $blocks.map((block) => block.blockedId);
 		friendUsername = $contacts.find((contact) => contact.id === friendId)?.username;
-		chatIdLocal = $friendInfoId;
 	}
 
 	onMount(() => {
 		$socket.on('updateChat', (chatId: number) => {
 			if (chatIdLocal === null || chatIdLocal === undefined) chatIdLocal = chatId;
 		});
-		$socket.on('updateGroupChat', () => {
-			noMember = true;
-		});
+		//$socket.on('updateGroupChat', () => {
+		//	noMember = true;
+		//});
 		chatWindow.scrollTop = chatWindow.scrollHeight;
 		updateLastMessageRead();
 	});
@@ -77,7 +78,6 @@
 	async function sendMessage() {
 		if (messageContent.trim() === '') return;
 		$socket.emit('sendMessage', {
-			chatId: chatIdLocal,
 			content: messageContent,
 			friendId: friendId
 		});
@@ -91,9 +91,9 @@
 	});
 
 	(async () => {
-		currentChat = await fetchConversationById($friendInfoId);
-		console.log("currentChat");
-		console.log(currentChat);
+		currentChat = await fetchConversationById(friendId);
+
+		console.log(friendId);
 	})();
 
 </script>
@@ -109,7 +109,7 @@
 			{#if currentChat}
 				{#each currentChat as message}
 					{#if !blockedIds.includes(message.senderId)}
-						<li class={message.senderId === $user?.id ? 'self' : 'other'}>
+						<li class={message.senderId === $user?.id ? 'other' : 'self'}>
 							<div class="message-header">
 								<strong on:click={() => openProfile(message.senderId)}
 										>{message.senderId === $user?.id ? friendUsername : $user?.username}</strong>
@@ -125,7 +125,8 @@
 		</ul>
 	</div>
 	<div id="sendMessage-window">
-		{#if isFriend && !noMember}
+		<!--{#if isFriend && !noMember}-->
+		{#if true}
 			<form on:submit|preventDefault={sendMessage} class="send-message-form">
 				<input type="text" bind:value={messageContent} class="message-input" autocomplete="off" />
 				<button type="submit" class="btn send-btn" disabled={isCreatingChat}>Send</button>

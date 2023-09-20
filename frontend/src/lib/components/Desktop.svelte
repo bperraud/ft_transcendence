@@ -7,19 +7,13 @@
 	import NotificationBadge from './NotificationBadge.svelte';
 
 	const chats = Context.chats();
-	const openChatWindow = Context.openChatWindow();
 	const openChatForumWindow = Context.openChatForumWindow();
-	const friendInfoId = Context.friendInfoId();
 	const openPongWindow = Context.openPongWindow();
-	const openFriendRequest = Context.openFriendRequest();
-	const openEditProfile = Context.openEditProfile();
 	const appInstances = Context.appInstances();
 	const zstack = Context.zstack();
 	const selected = Context.selected();
 	const addInstance = Context.addInstance();
 	const removeInstance = Context.removeInstance();
-	const outcome = Context.outcome();
-
 	const socket = Context.socket();
 
 	function putOnTop(id: string) {
@@ -27,25 +21,10 @@
 	}
 
 	$: {
-		if ($openChatWindow) {
-			addInstance('Chat', { friendId: $friendInfoId });
-			$selected = null;
-			openChatWindow.set(false);
-		}
 		if ($openChatForumWindow) {
 			addInstance('ChatForum');
 			$selected = null;
 			openChatForumWindow.set(false);
-		}
-		if ($openFriendRequest) {
-			addInstance('FriendRequest');
-			$selected = null;
-			openFriendRequest.set(false);
-		}
-		if ($openEditProfile) {
-			addInstance('EditProfile');
-			$selected = null;
-			openEditProfile.set(false);
 		}
 		if ($openPongWindow) {
 			addInstance('Pong');

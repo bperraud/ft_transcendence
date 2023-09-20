@@ -11,15 +11,12 @@
 	const fetchCreateChat = Context.fetchCreateChat();
 	const chats = Context.chats();
 	const chatId = Context.chatId();
-	const openChatWindow = Context.openChatWindow();
 	const contacts = Context.contacts();
 	const friendRequest = Context.friendRequest();
-	const openFriendRequest = Context.openFriendRequest();
 	const openPongWindow = Context.openPongWindow();
 	const addInstance = Context.addInstance();
 	const selected = Context.selected();
 	const askGame = Context.askGame();
-	const startChat = Context.startChat();
 
 	let selectedFriends: Context.Contact[] = [];
 	let friendInput: string = '';
@@ -84,7 +81,8 @@
 				$socket.emit('otherAddChat', { chat: chat, userId: friend.id });
 			});
 			$chatId = chat.id;
-			$openChatWindow = true;
+			// open group window
+			//addInstance('Chat', {}, { chatId: chat.id });
 		}
 		toggleGroupChatMode();
 	}
@@ -153,7 +151,7 @@
 									on:click={() => askGame(friend.id)}
 								/>
 							{/if}
-							<img class="option-icons" src="/write.png" on:click={() => startChat(friend)} />
+							<img class="option-icons" src="/write.png" on:click={() => addInstance('Chat', {}, { friendId: friend.id })} />
 							{#if friend.status === 'in-game'}
 								<img
 									class="option-icons"
@@ -195,7 +193,7 @@
 		<span class="notification-badge">
 			<NotificationBadge count={$friendRequest.length} />
 		</span>
-		<button on:click={() => ($openFriendRequest = true)}>Friend requests</button>
+		<button on:click={() => addInstance('FriendRequest')}>Friend requests</button>
 	</div>
 </div>
 

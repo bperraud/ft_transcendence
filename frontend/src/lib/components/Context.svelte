@@ -100,14 +100,11 @@
 			getContext('gameRequest');
 		export const history = (): Writable<Match[]> => getContext('history');
 		export const statistics = (): Writable<Stat> => getContext('statistics');
-		export const openFriendRequest = (): Writable<boolean> => getContext('openFriendRequest');
-		export const openEditProfile = (): Writable<boolean> => getContext('openEditProfile');
 		export const openPongWindow = (): Writable<boolean> => getContext('openPongWindow');
 		export const friendInfoId = (): Writable<number | null> => getContext('friendInfoId');
 		export const chats = (): Writable<Chat[]> => getContext('chats');
 		export const chatsPublic = (): Writable<Chat[]> => getContext('chatsPublic');
 		export const chatId = (): Writable<number | null> => getContext('chatId');
-		export const openChatWindow = (): Writable<boolean> => getContext('openChatWindow');
 		export const openChatForumWindow = (): Writable<boolean> => getContext('openChatForumWindow');
 		export const fetchSettings = (): (() => Promise<any>) => getContext('fetchSettings');
 		export const unreadConversations = (): Writable<number> => getContext('unreadConversations');
@@ -333,14 +330,11 @@
 	const history = writable<Context.Match[]>([]);
 	const statistics = writable<Context.Stat>();
 	const unreadConversations = writable(0);
-	const openFriendRequest = writable(false);
-	const openEditProfile = writable(false);
 	const openPongWindow = writable(false);
 	const friendInfoId = writable<number | null>(null);
 	const chats = writable<Context.Chat[]>([]);
 	const chatsPublic = writable<Context.Chat[]>([]);
 	const chatId = writable<number | null>(null);
-	const openChatWindow = writable(false);
 	const openChatForumWindow = writable(false);
 
 	setContext('contacts', contacts);
@@ -350,14 +344,11 @@
 	setContext('history', history);
 	setContext('statistics', statistics);
 	setContext('unreadConversations', unreadConversations);
-	setContext('openFriendRequest', openFriendRequest);
-	setContext('openEditProfile', openEditProfile);
 	setContext('openPongWindow', openPongWindow);
 	setContext('friendInfoId', friendInfoId);
 	setContext('chats', chats);
 	setContext('chatsPublic', chatsPublic);
 	setContext('chatId', chatId);
-	setContext('openChatWindow', openChatWindow);
 	setContext('openChatForumWindow', openChatForumWindow);
 
 	const settings = writable<Context.Settings>({
@@ -565,13 +556,7 @@
 
 	function startChat(friend: Context.Contact) {
 		let chat: any;
-
-		//if ($user) chat = findChat($user?.username, friend.username);
-		//$chatId = chat?.id;
-
-		$chatId = friend.id;
-		$friendInfoId = friend.id;
-		$openChatWindow = true;
+		addInstance('Chat', {}, { friendId: friend.id });
 	}
 
 	async function fetchUserById(id: number) {
