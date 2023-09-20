@@ -6,32 +6,41 @@ import { Chat, GroupMessage, Message } from '../chat/model/chat.model';
 export class ChatService {
   constructor(private prisma: PrismaService) {}
 
-  async getAllUserChats(username: string) {
-    // async getAllUserChats(username: string): Promise<Chat[]> {
-    //const chats = await this.prisma.chat.findMany({
-    //  where: {
-    //    chatUsers: {
-    //      some: {
-    //        user: {
-    //          username: username,
-    //        },
-    //      },
-    //    },
-    //  },
-    //  include: {
-    //    messages: {
-    //      include: {
-    //        user: true,
-    //      },
-    //    },
-    //    chatUsers: {
-    //      include: {
-    //        user: true,
-    //      },
-    //    },
-    //  },
-    //});
-    //return chats;
+  // async getAllUserChats(username: string): Promise<Chat[]> {
+  //const chats = await this.prisma.chat.findMany({
+  //  where: {
+  //    chatUsers: {
+  //      some: {
+  //        user: {
+  //          username: username,
+  //        },
+  //      },
+  //    },
+  //  },
+  //  include: {
+  //    messages: {
+  //      include: {
+  //        user: true,
+  //      },
+  //    },
+  //    chatUsers: {
+  //      include: {
+  //        user: true,
+  //      },
+  //    },
+  //  },
+  //});
+  //return chats;
+
+  async getConversation(userId: number, friendId: number) {
+    const messages = await this.prisma.$queryRaw<
+      any[]
+    >`SELECT content, "createdAt", "senderId"
+	 FROM "public"."Message"
+	 WHERE "senderId" = ${userId} AND "receiverId" = ${friendId} OR "senderId" = ${friendId} AND "receiverId" = ${userId}`;
+    console.log('messages');
+    console.log(messages);
+    return messages;
   }
 
   async createChat(
@@ -52,7 +61,7 @@ export class ChatService {
 
     let user;
 
-    let participants: number[];
+    const participants: number[] = [];
     const groupId = newGroupChat.id;
     memberUsernames.forEach(async (userName) => {
       user = await this.prisma.user.findUnique({
@@ -62,16 +71,6 @@ export class ChatService {
       });
       if (user) {
         participants.push(user.id);
-        await this.prisma.groupParticipant.create({
-          data: {
-            chat: {
-              connect: { id: newGroupChat.id },
-            },
-            user: {
-              connect: { id: user.id },
-            },
-          },
-        });
         await this.prisma.groupParticipant.create({
           data: {
             chat: {
@@ -133,7 +132,6 @@ export class ChatService {
         user: {
           connect: { id: userId },
         },
-        createdAt: new Date(),
       },
       include: {
         user: true,

@@ -4,38 +4,30 @@
 	import { user } from '$lib/stores';
 
 	const socket = Context.socket();
-
-	const chats = Context.chats();
 	const blocks = Context.blocks();
 	const chatId = Context.chatId();
 	const friendInfoId = Context.friendInfoId();
 	const contacts = Context.contacts();
 	const selected = Context.selected();
 	const addInstance = Context.addInstance();
-	const fetchCreateChat = Context.fetchCreateChat();
 	const fetchUpdateLastMessageRead = Context.fetchUpdateLastMessageRead();
+	const fetchConversationById = Context.fetchConversationById();
 
-	let userId = $user?.id;
 	let chatIdLocal: number | null = $chatId;
-	let currentChat: any = null;
+	let currentChat: Context.Message[];
 	let friendUsername: string | null | undefined = '';
 	let friendId: number | null = $friendInfoId;
 	let messageContent = '';
-	let isFriend = true;
 	let chatWindow: HTMLDivElement;
 	let autoScroll = true;
-	//let isCreatingChat = false;
+	let isCreatingChat = false;
 	let blockedIds: number[];
 	let noMember = false;
 
 	$: {
 		blockedIds = $blocks.map((block) => block.blockedId);
 		friendUsername = $contacts.find((contact) => contact.id === friendId)?.username;
-		isFriend = friendUsername != undefined;
-		if (chatIdLocal !== null && chatIdLocal !== undefined) {
-			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
-			if (currentChat && currentChat.isGroupChat) isFriend = true;
-		}
+		chatIdLocal = $friendInfoId;
 	}
 
 	onMount(() => {
@@ -71,36 +63,19 @@
 	}
 
 	async function updateLastMessageRead() {
-		const lastMessage = currentChat?.messages[currentChat?.messages.length - 1];
-		if (lastMessage && lastMessage.userId !== $user?.id) {
-			const chatUser = currentChat.chatUsers.find((user: any) => user.userId === userId);
-			if (chatIdLocal && lastMessage.id !== chatUser.lastReadMessageId && $user?.id) {
-				await fetchUpdateLastMessageRead(chatIdLocal, lastMessage.id, $user?.id);
-				currentChat.chatUsers.find((user: any) => user.userId === userId).lastReadMessageId =
-					lastMessage.id;
-			}
-		}
+		//const lastMessage = currentChat?.messages[currentChat?.messages.length - 1];
+		//if (lastMessage && lastMessage.userId !== $user?.id) {
+		//	const chatUser = currentChat.chatUsers.find((user: any) => user.userId === userId);
+		//	if (chatIdLocal && lastMessage.id !== chatUser.lastReadMessageId && $user?.id) {
+		//		await fetchUpdateLastMessageRead(chatIdLocal, lastMessage.id, $user?.id);
+		//		currentChat.chatUsers.find((user: any) => user.userId === userId).lastReadMessageId =
+		//			lastMessage.id;
+		//	}
+		//}
 	}
 
 	async function sendMessage() {
 		if (messageContent.trim() === '') return;
-		//if (isCreatingChat) return;
-		if (!chatIdLocal) {
-			//isCreatingChat = true;
-
-			const memberUsernames = [$user?.username, friendUsername];
-			const groupName = memberUsernames.join('-');
-			const chat = await fetchCreateChat(groupName, memberUsernames, false, 'private');
-			const chatExists = $chats.some((existingChat) => existingChat.id === chat.id);
-			if (!chatExists) {
-				//$chats = [...$chats, chat];
-				chatIdLocal = chat.id;
-				$socket.emit('joinRoom', { chatId: chat.id });
-				$socket.emit('otherAddChat', { chat: chat, userId: $user?.id });
-				$socket.emit('otherAddChat', { chat: chat, userId: friendId });
-			}
-			//isCreatingChat = false;
-		}
 		$socket.emit('sendMessage', {
 			chatId: chatIdLocal,
 			content: messageContent,
@@ -114,6 +89,13 @@
 		hour: 'numeric',
 		minute: '2-digit'
 	});
+
+	(async () => {
+		currentChat = await fetchConversationById($friendInfoId);
+		console.log("currentChat");
+		console.log(currentChat);
+	})();
+
 </script>
 
 <div id="box" on:click={handleClick}>
@@ -125,23 +107,16 @@
 		{/if}
 		<ul>
 			{#if currentChat}
-				{#each currentChat?.messages || [] as message, i (i)}
-					{#if !blockedIds.includes(message.userId)}
-						<li class={message.user?.id === $user?.id ? 'self' : 'other'}>
+				{#each currentChat as message}
+					{#if !blockedIds.includes(message.senderId)}
+						<li class={message.senderId === $user?.id ? 'self' : 'other'}>
 							<div class="message-header">
-								{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-									<strong on:click={() => openProfile(message.user?.id === $user.id ? null : message.user?.id)}
-										>{message.user?.username}</strong
-									>
-								{/if}
+								<strong on:click={() => openProfile(message.senderId)}
+										>{message.senderId === $user?.id ? friendUsername : $user?.username}</strong>
 							</div>
 							<div class="message-content">{message.content}</div>
 							<h6 class="clock">
-								{#if (i !== currentChat?.messages.length - 1
-									&& formatter.format(new Date(currentChat?.messages[i + 1].createdAt)) !== formatter.format(new Date(currentChat?.messages[i].createdAt)))
-									|| i === currentChat?.messages.length - 1}
-									{formatter.format(new Date(message.createdAt))}
-								{/if}
+								{formatter.format(new Date(message.createdAt))}
 							</h6>
 						</li>
 					{/if}

@@ -133,9 +133,12 @@ export class ChatGateway extends SocketGateway {
 
     const socket = this.webSocketService.getSocket(payload.friendId);
 
-    //client.emit('message', { chatId: chat.id, message: newMessage });
-    //if (socket)
-    //  socket.emit('message', { chatId: chat.id, message: newMessage });
+    client.emit('message', { friendId: payload.friendId, message: newMessage });
+    if (socket)
+      socket.emit('message', {
+        friendId: payload.friendId,
+        message: newMessage,
+      });
   }
 
   @SubscribeMessage('leaveGroup')

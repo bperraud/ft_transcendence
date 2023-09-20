@@ -17,10 +17,12 @@ export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @UseGuards(JwtGuard)
-  @Get('allUserChats')
-  async getAllUserChats(@GetUser() user) {
-    //const chats = await this.chatService.getAllUserChats(user.username);
-    //return chats;
+  @Get(':friendId')
+  async getAllUserChats(
+    @GetUser('id') id,
+    @Param('friendId') friendId: string,
+  ) {
+    return await this.chatService.getConversation(id, Number(friendId));
   }
 
   @UseGuards(JwtGuard)

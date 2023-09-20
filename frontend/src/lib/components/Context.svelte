@@ -65,13 +65,19 @@
 			userId: number;
 		};
 
-		interface Message {
-			chatId: number;
-			content: string;
-			createdAt: string;
-			id: number;
-			updatedAt: string;
-			userId: number;
+		//interface Message {
+		//	id: number;
+		//	chatId: number;
+		//	content: string;
+		//	createdAt: string;
+		//	updatedAt: string;
+		//	userId: number;
+		//}
+
+		export type Message = {
+			content : string;
+			senderId : number;
+			createdAt : Date;
 		}
 
 		export type Stat = {
@@ -197,6 +203,10 @@
 		export const fetchChats = (): (() => Promise<any>) => getContext('fetchChats');
 		export const fetchChatById = (): ((chatId: number) => Promise<any>) =>
 			getContext('fetchChatById');
+
+		export const fetchConversationById = (): ((friendId: number | null) => Promise<Message[]>) =>
+			getContext('fetchConversationById');
+
 		export const fetchPublicChats = (): ((start: number, limit: number) => Promise<any>) =>
 			getContext('fetchPublicChats');
 		export const fetchVerifyPassword = (): ((chatId: number, password: string) => Promise<any>) =>
@@ -556,8 +566,10 @@
 	function startChat(friend: Context.Contact) {
 		let chat: any;
 
-		if ($user) chat = findChat($user?.username, friend.username);
-		$chatId = chat?.id;
+		//if ($user) chat = findChat($user?.username, friend.username);
+		//$chatId = chat?.id;
+
+		$chatId = friend.id;
 		$friendInfoId = friend.id;
 		$openChatWindow = true;
 	}
@@ -658,6 +670,13 @@
 		return data;
 	}
 
+	async function fetchConversationById(friendId: number | null) {
+		const res = await fetchWithToken(`chat/${friendId}`);
+		if (!res.ok) throw new Error(res.statusText);
+		const data = await res.json();
+		return data;
+	}
+
 	async function fetchPublicChats(start: number, limit: number) {
 		const response = await fetchWithToken(`chat/publicChats?start=${start}&limit=${limit}`);
 		const data = await response.json();
@@ -722,6 +741,7 @@
 	setContext('fetchGetUserBlocks', fetchGetUserBlocks);
 	setContext('fetchFriendRequest', fetchFriendRequest);
 	setContext('fetchChatById', fetchChatById);
+	setContext('fetchConversationById', fetchConversationById);
 	setContext('fetchChats', fetchChats);
 	setContext('fetchCreateChat', fetchCreateChat);
 	setContext('fetchVerifyPassword', fetchVerifyPassword);
@@ -850,8 +870,8 @@
 		}
 	});
 
-	$socket.on('message', ({ chatId, message }) => {
-		let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
+	$socket.on('message', ({ friendId, message }) => {
+		let targetChatIndex = $chats.findIndex((chat) => chat.id === friendId);
 		if (targetChatIndex !== -1) {
 			let chatscopy = [...$chats];
 			chatscopy[targetChatIndex].messages.push(message);
