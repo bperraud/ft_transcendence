@@ -1,110 +1,107 @@
 generator client {
-  provider = "prisma-client-js"
+  	provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+	provider = "postgresql"
+	url      = env("DATABASE_URL")
 }
 
 model User {
-  id                  Int            @id @default(autoincrement())
-  login               String         @unique @db.VarChar(25)
-  username            String         @unique @db.VarChar(25)
-  hash                String?
-  logFrom42           Boolean        @default(false)
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
-  twoFactorEnabled    Boolean        @default(false)
-  twoFactorAuthSecret String?
+	id                  Int            @id @default(autoincrement())
+	login               String         @unique @db.VarChar(25)
+	username            String         @unique @db.VarChar(25)
+	hash                String?
+	logFrom42           Boolean        @default(false)
+	createdAt           DateTime       @default(now())
+	updatedAt           DateTime       @updatedAt
+	twoFactorEnabled    Boolean        @default(false)
+	twoFactorAuthSecret String?
 
-  settings            Settings?
-  stat                Stat?
-  chatStatus          ChatStatus[]
-  groupMessage		  GroupMessage[]
-  participant	      GroupParticipant[]
-  matchesAsLoser      Match[]         @relation("Loser")
-  matchesAsWinner     Match[]         @relation("Winner")
-  messagesSend 		  Message[]	      @relation("sender")
-  messagesReceived 	  Message[]	      @relation("receiver")
-  source              Relationship[]  @relation("user1")
-  destination         Relationship[]  @relation("user2")
-  userNotif		      Notification[]  @relation("user")
-  senderNotif		  Notification[]  @relation("sender")
+	settings            Settings?
+	stat                Stat?
+	chatStatus          ChatStatus[]
+	participant	        UserChatRelationship[]
+	messagesSend 		Message[]
+	matchesAsLoser      Match[]         @relation("Loser")
+	matchesAsWinner     Match[]         @relation("Winner")
+	source              Relationship[]  @relation("user1")
+	destination         Relationship[]  @relation("user2")
+	userNotif		    Notification[]  @relation("user")
+	senderNotif		    Notification[]  @relation("sender")
 }
 
 // create table relationship instead with status ( pending, accepted, blocked, mute )
 
 model Match {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
+	id          Int      @id @default(autoincrement())
+	createdAt   DateTime @default(now())
 
-  loserId  	  Int
-  winnerId    Int
-  scoreWinner Int
-  scoreLoser  Int
-  loser       User     @relation("Loser", fields: [loserId], references: [id])
-  winner      User     @relation("Winner", fields: [winnerId], references: [id])
+	loserId  	  Int
+	winnerId    Int
+	scoreWinner Int
+	scoreLoser  Int
+	loser       User     @relation("Loser", fields: [loserId], references: [id])
+	winner      User     @relation("Winner", fields: [winnerId], references: [id])
 }
 
 model Relationship {
-  id         Int      @id @default(autoincrement())
-  createdAt  DateTime @default(now())
-  type       String
+	id         Int      @id @default(autoincrement())
+	createdAt  DateTime @default(now())
+	type       String
 
-  user1Id  	 Int
-  user2Id  	 Int
-  user1      User     @relation("user1", fields: [user1Id], references: [id])
-  user2      User     @relation("user2",fields: [user2Id], references: [id])
-  @@unique([user1Id, user2Id, type])
+	user1Id  	 Int
+	user2Id  	 Int
+	user1      User     @relation("user1", fields: [user1Id], references: [id])
+	user2      User     @relation("user2",fields: [user2Id], references: [id])
+	@@unique([user1Id, user2Id, type])
 }
 
 model Notification {
-  id         Int      @id @default(autoincrement())
-  createdAt  DateTime @default(now())
-  type       String
+	id         Int      @id @default(autoincrement())
+	createdAt  DateTime @default(now())
+	type       String
 
-  senderId   Int
-  userId     Int
-  user       User     @relation("user", fields: [userId], references: [id])
-  sender     User     @relation("sender", fields: [senderId], references: [id])
-  @@unique([userId, senderId, type])
+	senderId   Int
+	userId     Int
+	user       User     @relation("user", fields: [userId], references: [id])
+	sender     User     @relation("sender", fields: [senderId], references: [id])
+	@@unique([userId, senderId, type])
 }
 
 model Stat {
-  id     Int    @id @default(autoincrement())
-  wins   Int    @default(0)
-  losses Int    @default(0)
-  elo    Int    @default(1000)
-  ladder String @default("silver")
+	id     Int    @id @default(autoincrement())
+	wins   Int    @default(0)
+	losses Int    @default(0)
+	elo    Int    @default(1000)
+	ladder String @default("silver")
 
-  userId Int    @unique // relation scalar field (used in the `@relation` attribute above)
-  user   User   @relation(fields: [userId], references: [id])
+	userId Int    @unique // relation scalar field (used in the `@relation` attribute above)
+	user   User   @relation(fields: [userId], references: [id])
 }
 
 model Settings {
-  id              Int    @id @default(autoincrement())
-  up              String @default("ArrowUp")
-  down            String @default("ArrowDown")
-  backgroundColor String @default("#000000")
-  objectsColor    String @default("#ffffff")
-  textColor       String @default("#ffffff")
+	id              Int    @id @default(autoincrement())
+	up              String @default("ArrowUp")
+	down            String @default("ArrowDown")
+	backgroundColor String @default("#000000")
+	objectsColor    String @default("#ffffff")
+	textColor       String @default("#ffffff")
 
-  userId Int      @unique // relation scalar field (used in the `@relation` attribute above)
-  user   User     @relation(fields: [userId], references: [id])
+	userId Int      @unique // relation scalar field (used in the `@relation` attribute above)
+	user   User     @relation(fields: [userId], references: [id])
 }
 
 model Message {
-  id        	Int      @id @default(autoincrement())
-  content   	String
-  createdAt 	DateTime @default(now())
+	id        	Int      @id @default(autoincrement())
+	content   	String
+	createdAt 	DateTime @default(now())
 
-  receiverId 	Int
-  senderId 	    Int
-  sender        User     @relation("sender", fields: [receiverId], references: [id])
-  receiver      User     @relation("receiver", fields: [senderId], references: [id])
+	chatId    	  Int
+	userId    	  Int
+	chat          Chat      @relation(fields: [chatId], references: [id])
+	user          User      @relation(fields: [userId], references: [id])
 }
-
 
 // public password ???
 model Chat {  // group chat
@@ -116,25 +113,14 @@ model Chat {  // group chat
 	accessibility String     @default("public")
 	password      String?
 
-	messages      GroupMessage[]
+	messages      Message[]
 	restriction   ChatStatus[]
-	participant	  GroupParticipant[]
+	participant	  UserChatRelationship[]
 }
 
-model GroupParticipant {
-	chatId    	  Int
-	userId    	  Int
-	chat          Chat      @relation(fields: [chatId], references: [id])
-	user          User      @relation(fields: [userId], references: [id])
-	@@id([chatId, userId])
-}
-
-model GroupMessage {
+model UserChatRelationship {
 	id            Int        @id @default(autoincrement())
-	createdAt     DateTime   @default(now())
-	updatedAt     DateTime   @updatedAt
 
-	content       String
 	chatId    	  Int
 	userId    	  Int
 	chat          Chat      @relation(fields: [chatId], references: [id])
@@ -142,15 +128,15 @@ model GroupMessage {
 }
 
 model ChatStatus {
-  id        Int        @id @default(autoincrement())
-  createdAt DateTime   @default(now())
-  expiresAt DateTime
-  status    String     @default("default") // admin / ban /mute
+	id        Int        @id @default(autoincrement())
+	createdAt DateTime   @default(now())
+	expiresAt DateTime
+	status    String     @default("default") // admin / ban /mute
 
-  chatId    Int
-  userId    Int
-  chat      Chat       @relation(fields: [chatId], references: [id])
-  user      User       @relation(fields: [userId], references: [id])
+	chatId    Int
+	userId    Int
+	chat      Chat       @relation(fields: [chatId], references: [id])
+	user      User       @relation(fields: [userId], references: [id])
 
 // @@id([chatId, userId])
 }

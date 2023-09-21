@@ -5,39 +5,53 @@
 
 	const socket = Context.socket();
 	const blocks = Context.blocks();
-	const chatId = Context.chatId();
+	//const chatId = Context.chatId();
+	const fetchChatById = Context.fetchChatById();
+	const chats = Context.chats();
 	const friendInfoId = Context.friendInfoId();
 	const contacts = Context.contacts();
 	const selected = Context.selected();
 	const addInstance = Context.addInstance();
 	const fetchUpdateLastMessageRead = Context.fetchUpdateLastMessageRead();
 	const fetchConversationById = Context.fetchConversationById();
-
-	let chatIdLocal: number | null = $chatId;
-	let currentChat: Context.Message[];
+	let userId = $user?.id;
+	//let chatIdLocal: number | null = $chatId;
+	//let currentChat: Context.Message[];
+	let currentChat: any = null;
 	let friendUsername: string | null | undefined = '';
 	let messageContent = '';
+	let isFriend = true;
 	let chatWindow: HTMLDivElement;
 	let autoScroll = true;
-	let isCreatingChat = false;
+	//let isCreatingChat = false;
 	let blockedIds: number[];
 	let noMember = false;
+	//let friendId: number | null = $friendInfoId;
+	//export let friendId: number | null = null;
 
-	export let friendId: number | null = null;
-
+	export let chatIdLocal: number;
 
 	$: {
 		blockedIds = $blocks.map((block) => block.blockedId);
-		friendUsername = $contacts.find((contact) => contact.id === friendId)?.username;
+		friendUsername = 'patrick' ;
+		//friendUsername = $contacts.find((contact) => contact.id === friendId)?.username;
+		//isFriend = friendUsername != undefined;
+		//if (chatIdLocal !== null && chatIdLocal !== undefined) {
+		//	currentChat = $chats.find((chat) => chat.id === chatIdLocal);
+		//	if (currentChat && currentChat.isGroupChat) isFriend = true;
+		//}
+		//chatIdLocal = chatId;
+
+		currentChat = $chats.find((chat) => chat.id === chatIdLocal);
 	}
 
 	onMount(() => {
 		$socket.on('updateChat', (chatId: number) => {
 			if (chatIdLocal === null || chatIdLocal === undefined) chatIdLocal = chatId;
 		});
-		//$socket.on('updateGroupChat', () => {
-		//	noMember = true;
-		//});
+		$socket.on('updateGroupChat', () => {
+			noMember = true;
+		});
 		chatWindow.scrollTop = chatWindow.scrollHeight;
 		updateLastMessageRead();
 	});
@@ -64,22 +78,36 @@
 	}
 
 	async function updateLastMessageRead() {
-		//const lastMessage = currentChat?.messages[currentChat?.messages.length - 1];
-		//if (lastMessage && lastMessage.userId !== $user?.id) {
-		//	const chatUser = currentChat.chatUsers.find((user: any) => user.userId === userId);
-		//	if (chatIdLocal && lastMessage.id !== chatUser.lastReadMessageId && $user?.id) {
-		//		await fetchUpdateLastMessageRead(chatIdLocal, lastMessage.id, $user?.id);
-		//		currentChat.chatUsers.find((user: any) => user.userId === userId).lastReadMessageId =
-		//			lastMessage.id;
-		//	}
-		//}
+		const lastMessage = currentChat?.messages[currentChat?.messages.length - 1];
+		if (lastMessage && lastMessage.userId !== $user?.id) {
+			const chatUser = currentChat.chatUsers.find((user: any) => user.userId === userId);
+			if (chatIdLocal && lastMessage.id !== chatUser.lastReadMessageId && $user?.id) {
+				await fetchUpdateLastMessageRead(chatIdLocal, lastMessage.id, $user?.id);
+				currentChat.chatUsers.find((user: any) => user.userId === userId).lastReadMessageId =
+					lastMessage.id;
+			}
+		}
 	}
 
 	async function sendMessage() {
 		if (messageContent.trim() === '') return;
+		//if (!chatIdLocal) {
+		//	const memberUsernames = [$user?.username, friendUsername];
+		//	const groupName = memberUsernames.join('-');
+		//	const chat = await fetchCreateChat(groupName, memberUsernames, false, 'private');
+		//	const chatExists = $chats.some((existingChat) => existingChat.id === chat.id);
+		//	if (!chatExists) {
+		//		//$chats = [...$chats, chat];
+		//		chatIdLocal = chat.id;
+		//		$socket.emit('joinRoom', { chatId: chat.id });
+		//		$socket.emit('otherAddChat', { chat: chat, userId: $user?.id });
+		//		$socket.emit('otherAddChat', { chat: chat, userId: friendId });
+		//	}
+		//}
 		$socket.emit('sendMessage', {
+			chatId: chatIdLocal,
 			content: messageContent,
-			friendId: friendId
+			userId: $user?.id,
 		});
 		messageContent = '';
 	}
@@ -91,9 +119,9 @@
 	});
 
 	(async () => {
-		currentChat = await fetchConversationById(friendId);
+		currentChat = await fetchChatById(chatIdLocal);
 
-		console.log(friendId);
+		console.log(currentChat);
 	})();
 
 </script>
@@ -107,16 +135,23 @@
 		{/if}
 		<ul>
 			{#if currentChat}
-				{#each currentChat as message}
-					{#if !blockedIds.includes(message.senderId)}
-						<li class={message.senderId === $user?.id ? 'other' : 'self'}>
+				{#each currentChat?.messages || [] as message, i (i)}
+					{#if !blockedIds.includes(message.userId)}
+						<li class={message.user?.id === $user?.id ? 'self' : 'other'}>
 							<div class="message-header">
-								<strong on:click={() => openProfile(message.senderId)}
-										>{message.senderId === $user?.id ? friendUsername : $user?.username}</strong>
+								{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
+									<strong on:click={() => openProfile(message.user?.id === $user.id ? null : message.user?.id)}
+										>{message.user?.username}</strong
+									>
+								{/if}
 							</div>
 							<div class="message-content">{message.content}</div>
 							<h6 class="clock">
-								{formatter.format(new Date(message.createdAt))}
+								{#if (i !== currentChat?.messages.length - 1
+									&& formatter.format(new Date(currentChat?.messages[i + 1].createdAt)) !== formatter.format(new Date(currentChat?.messages[i].createdAt)))
+									|| i === currentChat?.messages.length - 1}
+									{formatter.format(new Date(message.createdAt))}
+								{/if}
 							</h6>
 						</li>
 					{/if}
@@ -125,11 +160,10 @@
 		</ul>
 	</div>
 	<div id="sendMessage-window">
-		<!--{#if isFriend && !noMember}-->
-		{#if true}
+		{#if isFriend && !noMember}
 			<form on:submit|preventDefault={sendMessage} class="send-message-form">
 				<input type="text" bind:value={messageContent} class="message-input" autocomplete="off" />
-				<button type="submit" class="btn send-btn" disabled={isCreatingChat}>Send</button>
+				<button type="submit" class="btn send-btn">Send</button>
 			</form>
 		{:else}
 			<p>You can't talk with this chat</p>

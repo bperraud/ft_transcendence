@@ -10,7 +10,6 @@ import { ChatService } from './chat.service';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 import { WebSocketService } from 'src/websocket/websocket.service';
-import { add } from 'pactum/src/exports/reporter';
 
 @WebSocketGateway({
   cors: {
@@ -92,7 +91,7 @@ export class ChatGateway extends SocketGateway {
     //);
 
     const sendMessage = async () => {
-      const newMessage = await this.chatService.addGroupMessageToDatabase(
+      const newMessage = await this.chatService.addMessageToDatabase(
         chat.id,
         payload.content,
         user.id,

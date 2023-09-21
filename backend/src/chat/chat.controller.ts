@@ -12,20 +12,25 @@ import { JwtGuard } from '../auth/guard';
 import { UseGuards } from '@nestjs/common';
 import { GetUser } from '../auth/decorator';
 
+@UseGuards(JwtGuard)
 @Controller('chat')
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
-  @UseGuards(JwtGuard)
   @Get(':friendId')
-  async getAllUserChats(
+  async getConversation(
     @GetUser('id') id,
     @Param('friendId') friendId: string,
   ) {
     return await this.chatService.getConversation(id, Number(friendId));
   }
 
-  @UseGuards(JwtGuard)
+  @Get('allUserChats')
+  async getAllUserChats(@GetUser() user) {
+    const chats = await this.chatService.getAllUserChats(user.username);
+    return chats;
+  }
+
   @Get('publicChats')
   async getPublicChats(
     @Query('start') start: string,
@@ -38,7 +43,6 @@ export class ChatController {
     return { chats, totalChatsCount };
   }
 
-  @UseGuards(JwtGuard)
   @Get(':chatId')
   async findChatById(@Param('chatId') chatId: string) {
     const chat = await this.chatService.findChatById(Number(chatId));
@@ -59,7 +63,6 @@ export class ChatController {
     else return false;
   }
 
-  @UseGuards(JwtGuard)
   @Post('create-chat')
   async createChat(
     @Body('groupName') groupName: string,

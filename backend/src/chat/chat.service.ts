@@ -6,42 +6,43 @@ import { Chat, GroupMessage, Message } from '../chat/model/chat.model';
 export class ChatService {
   constructor(private prisma: PrismaService) {}
 
-  // async getAllUserChats(username: string): Promise<Chat[]> {
-  //const chats = await this.prisma.chat.findMany({
-  //  where: {
-  //    chatUsers: {
-  //      some: {
-  //        user: {
-  //          username: username,
-  //        },
-  //      },
-  //    },
-  //  },
-  //  include: {
-  //    messages: {
-  //      include: {
-  //        user: true,
-  //      },
-  //    },
-  //    chatUsers: {
-  //      include: {
-  //        user: true,
-  //      },
-  //    },
-  //  },
-  //});
-  //return chats;
-
-  async getConversation(userId: number, friendId: number) {
-    const messages = await this.prisma.$queryRaw<
-      any[]
-    >`SELECT content, "createdAt", "senderId"
-	 FROM "public"."Message"
-	 WHERE "senderId" = ${userId} AND "receiverId" = ${friendId} OR "senderId" = ${friendId} AND "receiverId" = ${userId}`;
-    console.log('messages');
-    console.log(messages);
-    return messages;
+  async getAllUserChats(username: string): Promise<Chat[]> {
+    const chats = await this.prisma.chat.findMany({
+      where: {
+        chatUsers: {
+          some: {
+            user: {
+              username: username,
+            },
+          },
+        },
+      },
+      include: {
+        messages: {
+          include: {
+            user: true,
+          },
+        },
+        chatUsers: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+    return chats;
   }
+
+//  async getConversation(userId: number, friendId: number) {
+//    const messages = await this.prisma.$queryRaw<
+//      any[]
+//    >`SELECT content, "createdAt", "senderId"
+//	 FROM "public"."Message"
+//	 WHERE "senderId" = ${userId} AND "receiverId" = ${friendId} OR "senderId" = ${friendId} AND "receiverId" = ${userId}`;
+//    console.log('messages');
+//    console.log(messages);
+//    return messages;
+//  }
 
   async createChat(
     groupName: string,
@@ -87,6 +88,39 @@ export class ChatService {
     return { groupId, participants };
   }
 
+  async findChatByUsernames(
+    username1: string,
+    username2: string,
+  ): Promise<Chat | null> {
+    //const chat = await this.prisma.chat.findFirst({
+    //  where: {
+    //    chatUsers: {
+    //      some: {
+    //        user: {
+    //          username: username1,
+    //        },
+    //      },
+    //    },
+    //  },
+    //  include: {
+    //    chatUsers: {
+    //      include: {
+    //        user: true,
+    //        role: true,
+    //      },
+    //    },
+    //    messages: {
+    //      include: {
+    //        user: true,
+    //      },
+    //    },
+    //    bans: true,
+    //    mutes: true,
+    //  },
+    //});
+    //return chat;
+  }
+
   async findChatById(id: number | null) {
     if (id === undefined || id === null) return null;
     const chat = await this.prisma.chat.findUnique({
@@ -118,27 +152,27 @@ export class ChatService {
   }
 
   // addNewMessage
-  async addGroupMessageToDatabase(
-    chatId: number,
-    content: string,
-    userId: number,
-  ): Promise<GroupMessage> {
-    const newMessage = await this.prisma.groupMessage.create({
-      data: {
-        content: content,
-        chat: {
-          connect: { id: chatId },
-        },
-        user: {
-          connect: { id: userId },
-        },
-      },
-      include: {
-        user: true,
-      },
-    });
-    return newMessage;
-  }
+//  async addGroupMessageToDatabase(
+//    chatId: number,
+//    content: string,
+//    userId: number,
+//  ): Promise<GroupMessage> {
+//    const newMessage = await this.prisma.groupMessage.create({
+//      data: {
+//        content: content,
+//        chat: {
+//          connect: { id: chatId },
+//        },
+//        user: {
+//          connect: { id: userId },
+//        },
+//      },
+//      include: {
+//        user: true,
+//      },
+//    });
+//    return newMessage;
+//  }
 
   async leaveGroup(chatId: number, userId: number): Promise<any> {
     const result = await this.prisma.groupParticipant.deleteMany({

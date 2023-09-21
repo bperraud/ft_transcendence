@@ -44,6 +44,15 @@
 		//	username: string;
 		//};
 
+		export type Conversation = {
+			//id: number;
+			friendId: number;
+			messages: Message[];
+			//createdAt: string;
+			//updatedAt: string;
+			//userId: number;
+		}
+
 		export type Chat = {
 			chatUsers: ChatUser[];
 			messages: Message[];
@@ -64,15 +73,6 @@
 			user: User;
 			userId: number;
 		};
-
-		//interface Message {
-		//	id: number;
-		//	chatId: number;
-		//	content: string;
-		//	createdAt: string;
-		//	updatedAt: string;
-		//	userId: number;
-		//}
 
 		export type Message = {
 			content : string;
@@ -569,7 +569,6 @@
 		const res = await fetchWithToken('friend/me');
 		const data = await res.json();
 		$contacts = data;
-		console.log(data);
 		return data;
 	}
 
