@@ -18,11 +18,8 @@ export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @Get(':friendId')
-  async getConversation(
-    @GetUser('id') id,
-    @Param('friendId') friendId: string,
-  ) {
-    return await this.chatService.getConversation(id, Number(friendId));
+  async getConversation(@GetUser('id') id, @Param('friendId') chatId: string) {
+    return await this.chatService.getConversation(Number(chatId));
   }
 
   @Get('allUserChats')
@@ -44,14 +41,14 @@ export class ChatController {
   }
 
   @Get(':chatId')
-  async findChatById(@Param('chatId') chatId: string) {
-    const chat = await this.chatService.findChatById(Number(chatId));
+  async getChatById(@Param('chatId') chatId: string) {
+    const chat = await this.chatService.getChatById(Number(chatId));
     return chat;
   }
 
   @Post('verifyPassword')
   async verifyPassword(@Body() body: { chatId: string; password: string }) {
-    const chat = await this.chatService.findChatById(Number(body.chatId));
+    const chat = await this.chatService.getChatById(Number(body.chatId));
     if (chat.accessibility === 'public' || chat.accessibility === 'private')
       return true;
     if (

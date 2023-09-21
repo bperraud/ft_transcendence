@@ -106,8 +106,8 @@
 		//}
 		$socket.emit('sendMessage', {
 			chatId: chatIdLocal,
-			content: messageContent,
 			userId: $user?.id,
+			content: messageContent,
 		});
 		messageContent = '';
 	}

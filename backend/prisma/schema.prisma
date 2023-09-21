@@ -98,9 +98,9 @@ model Message {
 	createdAt 	DateTime @default(now())
 
 	chatId    	  Int
-	userId    	  Int
+	senderId   	  Int
 	chat          Chat      @relation(fields: [chatId], references: [id])
-	user          User      @relation(fields: [userId], references: [id])
+	sender        User      @relation(fields: [senderId], references: [id])
 }
 
 // public password ???

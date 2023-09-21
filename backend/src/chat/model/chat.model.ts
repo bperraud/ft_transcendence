@@ -23,9 +23,9 @@ export type Message = {
   id: number;
   createdAt: Date; // Change this from string to Date
   //  updatedAt: Date; // Likely need to change this too
+  chatId: number;
   content: string;
   senderId: number;
-  receiverId: number;
 };
 
 export type GroupMessage = {

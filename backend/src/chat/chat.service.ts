@@ -1,48 +1,49 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Chat, GroupMessage, Message } from '../chat/model/chat.model';
+import { Chat, Message } from '../chat/model/chat.model';
 
 @Injectable()
 export class ChatService {
   constructor(private prisma: PrismaService) {}
 
   async getAllUserChats(username: string): Promise<Chat[]> {
-    const chats = await this.prisma.chat.findMany({
-      where: {
-        chatUsers: {
-          some: {
-            user: {
-              username: username,
-            },
-          },
-        },
-      },
-      include: {
-        messages: {
-          include: {
-            user: true,
-          },
-        },
-        chatUsers: {
-          include: {
-            user: true,
-          },
-        },
-      },
-    });
+    //const chats = await this.prisma.chat.findMany({
+    //  where: {
+    //    chatUsers: {
+    //      some: {
+    //        user: {
+    //          username: username,
+    //        },
+    //      },
+    //    },
+    //  },
+    //  include: {
+    //    messages: {
+    //      include: {
+    //        user: true,
+    //      },
+    //    },
+    //    chatUsers: {
+    //      include: {
+    //        user: true,
+    //      },
+    //    },
+    //  },
+    //});
+    const chats: Chat[] = [];
     return chats;
   }
 
-//  async getConversation(userId: number, friendId: number) {
-//    const messages = await this.prisma.$queryRaw<
-//      any[]
-//    >`SELECT content, "createdAt", "senderId"
-//	 FROM "public"."Message"
-//	 WHERE "senderId" = ${userId} AND "receiverId" = ${friendId} OR "senderId" = ${friendId} AND "receiverId" = ${userId}`;
-//    console.log('messages');
-//    console.log(messages);
-//    return messages;
-//  }
+  async getConversation(chatId: number) {
+    const messages = await this.prisma.$queryRaw<
+      any[]
+    >`SELECT content, "createdAt", "userId"
+	FROM "public"."Message"
+	WHERE "chatId" = ${chatId}`;
+    console.log('messages');
+    console.log(messages);
+    return messages;
+  }
 
   async createChat(
     groupName: string,
@@ -55,8 +56,6 @@ export class ChatService {
         name: groupName,
         accessibility: accessibility,
         password: password,
-        updatedAt: new Date(),
-        createdAt: new Date(),
       },
     });
 
@@ -72,7 +71,7 @@ export class ChatService {
       });
       if (user) {
         participants.push(user.id);
-        await this.prisma.groupParticipant.create({
+        await this.prisma.userChatRelationship.create({
           data: {
             chat: {
               connect: { id: newGroupChat.id },
@@ -88,40 +87,16 @@ export class ChatService {
     return { groupId, participants };
   }
 
-  async findChatByUsernames(
-    username1: string,
-    username2: string,
-  ): Promise<Chat | null> {
-    //const chat = await this.prisma.chat.findFirst({
-    //  where: {
-    //    chatUsers: {
-    //      some: {
-    //        user: {
-    //          username: username1,
-    //        },
-    //      },
-    //    },
-    //  },
-    //  include: {
-    //    chatUsers: {
-    //      include: {
-    //        user: true,
-    //        role: true,
-    //      },
-    //    },
-    //    messages: {
-    //      include: {
-    //        user: true,
-    //      },
-    //    },
-    //    bans: true,
-    //    mutes: true,
-    //  },
-    //});
-    //return chat;
+  async getChatId(membersId: string[]): Promise<number> {
+    const chatid = await this.prisma.$queryRaw<number>` SELECT "chatId"
+	  FROM "public"."UserChatRelationship"
+	  WHERE "userId" IN (${membersId})
+	  GROUP BY "chatId"
+	  HAVING COUNT(DISTINCT "userId") = ${membersId.length}`;
+    return chatid;
   }
 
-  async findChatById(id: number | null) {
+  async getChatById(id: number | null) {
     if (id === undefined || id === null) return null;
     const chat = await this.prisma.chat.findUnique({
       where: {
@@ -132,9 +107,9 @@ export class ChatService {
   }
 
   async addMessageToDatabase(
-    content: string,
+    chatId: number,
     userId: number,
-    friendId: number,
+    content: string,
   ): Promise<Message> {
     const newMessage = await this.prisma.message.create({
       data: {
@@ -142,8 +117,8 @@ export class ChatService {
         sender: {
           connect: { id: userId },
         },
-        receiver: {
-          connect: { id: friendId },
+        chat: {
+          connect: { id: chatId },
         },
         createdAt: new Date(),
       },
@@ -151,31 +126,8 @@ export class ChatService {
     return newMessage;
   }
 
-  // addNewMessage
-//  async addGroupMessageToDatabase(
-//    chatId: number,
-//    content: string,
-//    userId: number,
-//  ): Promise<GroupMessage> {
-//    const newMessage = await this.prisma.groupMessage.create({
-//      data: {
-//        content: content,
-//        chat: {
-//          connect: { id: chatId },
-//        },
-//        user: {
-//          connect: { id: userId },
-//        },
-//      },
-//      include: {
-//        user: true,
-//      },
-//    });
-//    return newMessage;
-//  }
-
   async leaveGroup(chatId: number, userId: number): Promise<any> {
-    const result = await this.prisma.groupParticipant.deleteMany({
+    const result = await this.prisma.userChatRelationship.deleteMany({
       where: {
         chatId: chatId,
         userId: userId,
@@ -228,7 +180,7 @@ export class ChatService {
   }
 
   async addUserToChat(chatId: number, userId: number) {
-    const chatUser = await this.prisma.groupParticipant.create({
+    const chatUser = await this.prisma.userChatRelationship.create({
       data: {
         chat: {
           connect: { id: chatId },
