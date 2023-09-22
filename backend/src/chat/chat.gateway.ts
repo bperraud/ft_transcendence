@@ -38,25 +38,26 @@ export class ChatGateway extends SocketGateway {
   async handleCreateChat(
     client: Socket,
     payload: {
+      membersId: number[];
       groupName: string;
-      memberUsernames: string[];
       accessibility: string;
       password?: string;
     },
   ) {
-    const result = await this.chatService.createChat(
+    const chatId = await this.chatService.createChat(
+      payload.membersId,
       payload.groupName,
-      payload.memberUsernames,
       payload.accessibility,
       payload.password,
     );
 
-    for (const member of result.participants) {
-      const memberSocket = this.webSocketService.getSocket(member);
-      if (memberSocket) memberSocket.join(`chat-${result.groupId}`);
-    }
-    this.server.to(`chat-${result.groupId}`).emit('addChat', result.groupId);
-    client.emit('createChat', result.groupId);
+    //for (const member of result.participants) {
+    //  const memberSocket = this.webSocketService.getSocket(member);
+    //  if (memberSocket) memberSocket.join(`chat-${result.groupId}`);
+    //}
+    //this.server.to(`chat-${result.groupId}`).emit('addChat', result.groupId);
+    client.emit('createChat', chatId);
+    return chatId;
   }
 
   @SubscribeMessage('otherAddChat')

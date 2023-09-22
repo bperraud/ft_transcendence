@@ -178,7 +178,7 @@
 		export const removeInstance = (): ((id: string) => void) => getContext('removeInstance');
 
 		export const askGame = (): ((friendId: number) => string) => getContext('askGame');
-		export const startChat = (): ((friend: Context.User) => string) => getContext('startChat');
+		export const startChat = (): ((membersId: number[]) => void) => getContext('startChat');
 
 		export const fetchHistory = (): (() => Promise<any>) => getContext('fetchHistory');
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
@@ -201,7 +201,7 @@
 		export const fetchChatById = (): ((chatId: number) => Promise<any>) =>
 			getContext('fetchChatById');
 
-		export const fetchConversationById = (): ((friendId: number | null) => Promise<Message[]>) =>
+		export const fetchConversationById = (): ((chatId: number | null) => Promise<Message[]>) =>
 			getContext('fetchConversationById');
 
 		export const fetchPublicChats = (): ((start: number, limit: number) => Promise<any>) =>
@@ -290,6 +290,7 @@
 	import { onDestroy } from 'svelte';
 	import { v4 as uuidv4 } from 'uuid';
 	import { logout } from '$lib/utils/connect';
+	import { dataset_dev } from 'svelte/internal';
 
 	let intervals: number[] = [];
 
@@ -542,21 +543,49 @@
 		});
 	}
 
-	function findChat(user1: string, user2: string) {
-		let foundChat;
+	//function findChat(user1: string, user2: string) {
+	//	let foundChat;
 
-		$chats.forEach((chat) => {
-			const users = chat.chatUsers.map((chatUser) => chatUser.user.username);
-			if (users.includes(user1) && users.includes(user2) && chat.isGroupChat === false) {
-				foundChat = chat;
-			}
-		});
-		return foundChat;
+	//	$chats.forEach((chat) => {
+	//		const users = chat.chatUsers.map((chatUser) => chatUser.user.username);
+	//		if (users.includes(user1) && users.includes(user2) && chat.isGroupChat === false) {
+	//			foundChat = chat;
+	//		}
+	//	});
+	//	return foundChat;
+	//}
+
+	async function getChatId(membersId: number[]) : Promise<number> {
+		const membersIdString = membersId.join(',');
+		const res = await fetchWithToken(`chat/chatId?ids=${membersIdString}`);
+		const data = await res.json();
+		return data.chatId;
 	}
 
-	function startChat(friend: Context.Contact) {
-		let chat: any;
-		addInstance('Chat', {}, { friendId: friend.id });
+	async function startChat(membersId: number[]) {
+
+		console.log("membersId");
+		console.log(membersId);
+		let chatId : number = await getChatId(membersId);
+
+		if (chatId == -1) {
+			console.log("create-chat");
+			const res = await fetchWithToken('chat/create-chat', {
+				method: 'POST',
+				headers: {
+						'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					membersId : membersId,
+					accessibility: 'private',
+				})
+			});
+			const data = await res.json();
+			chatId = data.id;
+			console.log(chatId);
+			console.log("startChat");
+		}
+		addInstance('Chat', {}, { chatId: chatId });
 	}
 
 	async function fetchUserById(id: number) {
@@ -614,11 +643,11 @@
 	}
 
 	async function fetchChats() {
-		const res = await fetchWithToken('chat/allUserChats');
-		const data = await res.json();
-		$chats = data;
-		await fetchUnreadConversations();
-		return data;
+		//const res = await fetchWithToken('chat/allUserChats');
+		//const data = await res.json();
+		//$chats = data;
+		//await fetchUnreadConversations();
+		//return data;
 	}
 
 	async function fetchCreateChat(
@@ -628,23 +657,23 @@
 		accessibility: string,
 		password?: string
 	) {
-		const response = await fetchWithToken('chat/create-chat', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				groupName,
-				memberUsernames,
-				isGroupChat,
-				accessibility,
-				password
-			})
-		});
+		//const response = await fetchWithToken('chat/create-chat', {
+		//	method: 'POST',
+		//	headers: {
+		//		'Content-Type': 'application/json'
+		//	},
+		//	body: JSON.stringify({
+		//		groupName,
+		//		memberUsernames,
+		//		isGroupChat,
+		//		accessibility,
+		//		password
+		//	})
+		//});
 
-		if (!response.ok) throw new Error(`Error: ${response.statusText}`);
-		const newGroupChat = await response.json();
-		return newGroupChat;
+		//if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+		//const newGroupChat = await response.json();
+		//return newGroupChat;
 	}
 
 	async function fetchChatById(chatId: number) {
@@ -654,8 +683,8 @@
 		return data;
 	}
 
-	async function fetchConversationById(friendId: number | null) {
-		const res = await fetchWithToken(`chat/${friendId}`);
+	async function fetchConversationById(chatId: number | null) {
+		const res = await fetchWithToken(`chat/${chatId}`);
 		if (!res.ok) throw new Error(res.statusText);
 		const data = await res.json();
 		return data;

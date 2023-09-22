@@ -20,7 +20,6 @@ model User {
 
 	settings            Settings?
 	stat                Stat?
-	chatStatus          ChatStatus[]
 	participant	        UserChatRelationship[]
 	messagesSend 		Message[]
 	matchesAsLoser      Match[]         @relation("Loser")
@@ -37,7 +36,7 @@ model Match {
 	id          Int      @id @default(autoincrement())
 	createdAt   DateTime @default(now())
 
-	loserId  	  Int
+	loserId  	Int
 	winnerId    Int
 	scoreWinner Int
 	scoreLoser  Int
@@ -93,50 +92,38 @@ model Settings {
 }
 
 model Message {
-	id        	Int      @id @default(autoincrement())
+	id        	Int     	@id @default(autoincrement())
 	content   	String
-	createdAt 	DateTime @default(now())
+	createdAt 	DateTime	@default(now())
 
 	chatId    	  Int
 	senderId   	  Int
-	chat          Chat      @relation(fields: [chatId], references: [id])
+	chat          Chat      @relation(fields: [chatId], references: [id], onDelete: Cascade)
 	sender        User      @relation(fields: [senderId], references: [id])
 }
 
 // public password ???
-model Chat {  // group chat
+model Chat {
 	id            Int        @id @default(autoincrement())
 
 	createdAt     DateTime   @default(now())
-	updatedAt     DateTime   @updatedAt
-	name          String     @unique @db.VarChar(30)
+	name          String?    @db.VarChar(30)
 	accessibility String     @default("public")
 	password      String?
 
 	messages      Message[]
-	restriction   ChatStatus[]
 	participant	  UserChatRelationship[]
 }
 
 model UserChatRelationship {
 	id            Int        @id @default(autoincrement())
+	createdAt DateTime       @default(now())
+	expiresAt DateTime       @default(now())
+	status    String         @default("default") // admin / ban /mute
 
 	chatId    	  Int
 	userId    	  Int
-	chat          Chat      @relation(fields: [chatId], references: [id])
-	user          User      @relation(fields: [userId], references: [id])
-}
-
-model ChatStatus {
-	id        Int        @id @default(autoincrement())
-	createdAt DateTime   @default(now())
-	expiresAt DateTime
-	status    String     @default("default") // admin / ban /mute
-
-	chatId    Int
-	userId    Int
-	chat      Chat       @relation(fields: [chatId], references: [id])
-	user      User       @relation(fields: [userId], references: [id])
-
-// @@id([chatId, userId])
+	chat          Chat       @relation(fields: [chatId], references: [id], onDelete: Cascade)
+	user          User       @relation(fields: [userId], references: [id])
+	@@unique([userId, chatId])
 }

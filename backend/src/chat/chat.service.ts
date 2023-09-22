@@ -36,8 +36,8 @@ export class ChatService {
 
   async getConversation(chatId: number) {
     const messages = await this.prisma.$queryRaw<
-      any[]
-    >`SELECT content, "createdAt", "userId"
+      Message[]
+    >`SELECT content, "createdAt", "senderId"
 	FROM "public"."Message"
 	WHERE "chatId" = ${chatId}`;
     console.log('messages');
@@ -46,54 +46,46 @@ export class ChatService {
   }
 
   async createChat(
-    groupName: string,
-    memberUsernames: string[],
-    accessibility: string,
+    membersId: number[],
+    accessibility?: string,
+    name?: string,
     password?: string,
-  ): Promise<{ groupId: number; participants: number[] }> {
+  ): Promise<number> {
     const newGroupChat = await this.prisma.chat.create({
       data: {
-        name: groupName,
+        name: name,
         accessibility: accessibility,
         password: password,
       },
     });
 
-    let user;
-
     const participants: number[] = [];
-    const groupId = newGroupChat.id;
-    memberUsernames.forEach(async (userName) => {
-      user = await this.prisma.user.findUnique({
-        where: {
-          username: userName,
+    membersId.forEach(async (userId) => {
+      participants.push(userId);
+      await this.prisma.userChatRelationship.create({
+        data: {
+          chat: {
+            connect: { id: newGroupChat.id },
+          },
+          user: {
+            connect: { id: userId },
+          },
         },
       });
-      if (user) {
-        participants.push(user.id);
-        await this.prisma.userChatRelationship.create({
-          data: {
-            chat: {
-              connect: { id: newGroupChat.id },
-            },
-            user: {
-              connect: { id: user.id },
-            },
-          },
-        });
-      }
     });
 
-    return { groupId, participants };
+    return newGroupChat.id;
   }
 
-  async getChatId(membersId: string[]): Promise<number> {
-    const chatid = await this.prisma.$queryRaw<number>` SELECT "chatId"
+  async getChatId(membersId: string[]): Promise<number[]> {
+    const ids = membersId.map((str) => BigInt(str));
+    const len = membersId.length;
+    const chatId = await this.prisma.$queryRaw<number[]>` SELECT "chatId"
 	  FROM "public"."UserChatRelationship"
-	  WHERE "userId" IN (${membersId})
+	  WHERE "userId" = ANY(${ids}::bigint[])
 	  GROUP BY "chatId"
-	  HAVING COUNT(DISTINCT "userId") = ${membersId.length}`;
-    return chatid;
+	  HAVING COUNT(DISTINCT "userId") = ${len}`;
+    return chatId;
   }
 
   async getChatById(id: number | null) {
@@ -111,19 +103,26 @@ export class ChatService {
     userId: number,
     content: string,
   ): Promise<Message> {
-    const newMessage = await this.prisma.message.create({
-      data: {
-        content: content,
-        sender: {
-          connect: { id: userId },
+    console.log('addMessageToDatabase');
+    console.log(chatId);
+
+    try {
+      const newMessage = await this.prisma.message.create({
+        data: {
+          content: content,
+          sender: {
+            connect: { id: userId },
+          },
+          chat: {
+            connect: { id: chatId },
+          },
+          //createdAt: new Date(),
         },
-        chat: {
-          connect: { id: chatId },
-        },
-        createdAt: new Date(),
-      },
-    });
-    return newMessage;
+      });
+      return newMessage;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async leaveGroup(chatId: number, userId: number): Promise<any> {

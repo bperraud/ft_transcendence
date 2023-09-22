@@ -17,9 +17,31 @@ import { GetUser } from '../auth/decorator';
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
-  @Get(':friendId')
-  async getConversation(@GetUser('id') id, @Param('friendId') chatId: string) {
+  @Get('conversation/:chatId')
+  async getConversation(@Param('chatId') chatId: string) {
     return await this.chatService.getConversation(Number(chatId));
+  }
+
+  //  @Get(':chatId')
+  //  async getChatById(@Param('chatId') chatId: string) {
+  //    const chat = await this.chatService.getChatById(Number(chatId));
+  //    return chat;
+  //  }
+
+  @Get('chatId')
+  async getChatId(
+    @GetUser('id') id,
+    @Query('ids') membersId: string | string[],
+  ) {
+    if (!Array.isArray(membersId)) {
+      membersId = [membersId];
+    }
+    membersId.push(id);
+    const chatId = await this.chatService.getChatId(membersId);
+    if (chatId.length === 0) {
+      return { chatId: -1 };
+    }
+    return { chatId: chatId[0] };
   }
 
   @Get('allUserChats')
@@ -40,12 +62,6 @@ export class ChatController {
     return { chats, totalChatsCount };
   }
 
-  @Get(':chatId')
-  async getChatById(@Param('chatId') chatId: string) {
-    const chat = await this.chatService.getChatById(Number(chatId));
-    return chat;
-  }
-
   @Post('verifyPassword')
   async verifyPassword(@Body() body: { chatId: string; password: string }) {
     const chat = await this.chatService.getChatById(Number(body.chatId));
@@ -62,19 +78,21 @@ export class ChatController {
 
   @Post('create-chat')
   async createChat(
-    @Body('groupName') groupName: string,
-    @Body('memberUsernames') memberUsernames: string[],
-    @Body('accessibility') accessibility: string,
+    @GetUser('id') id,
+    @Body('membersId') membersId: number[],
+    @Body('name') name?: string,
+    @Body('accessibility') accessibility?: string,
     @Body('password') password?: string,
   ) {
+    membersId.push(id);
     const newGroupChat = await this.chatService.createChat(
-      groupName,
-      memberUsernames,
+      membersId,
+      name,
       accessibility,
       password,
     );
 
-    return newGroupChat;
+    return { chatId: newGroupChat };
   }
 
   @Patch('updateLastMessageRead')

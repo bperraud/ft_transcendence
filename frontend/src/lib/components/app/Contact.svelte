@@ -17,6 +17,7 @@
 	const addInstance = Context.addInstance();
 	const selected = Context.selected();
 	const askGame = Context.askGame();
+	const startChat = Context.startChat();
 
 	let selectedFriends: Context.Contact[] = [];
 	let friendInput: string = '';
@@ -68,22 +69,23 @@
 	}
 
 	async function createGroupChat() {
-		const memberUsernames = selectedFriends.map(friend => friend.username);
-		memberUsernames.push($user?.username);
-		const groupName = memberUsernames.join(', ');
+		//const memberUsernames = selectedFriends.map(friend => friend.username);
+		//memberUsernames.push($user?.username);
+		//const groupName = memberUsernames.join(', ');
 
-		const chat = await fetchCreateChat(groupName, memberUsernames, true, 'private');
-		if (chat) {
-			$chats = [...$chats, chat];
-			$chatId = chat.id;
-			$socket.emit('joinRoom', { chatId: chat.id });
-			selectedFriends.forEach(friend => {
-				$socket.emit('otherAddChat', { chat: chat, userId: friend.id });
-			});
-			$chatId = chat.id;
-			// open group window
-			//addInstance('Chat', {}, { chatId: chat.id });
-		}
+		//const chat = await fetchCreateChat(groupName, memberUsernames, true, 'private');
+		//if (chat) {
+		//	$chats = [...$chats, chat];
+		//	$chatId = chat.id;
+		//	$socket.emit('joinRoom', { chatId: chat.id });
+		//	selectedFriends.forEach(friend => {
+		//		$socket.emit('otherAddChat', { chat: chat, userId: friend.id });
+		//	});
+		//	$chatId = chat.id;
+		//	// open group window
+		//	//addInstance('Chat', {}, { chatId: chat.id });
+		//}
+		//startChat(selectedFriends);
 		toggleGroupChatMode();
 	}
 
@@ -151,7 +153,7 @@
 									on:click={() => askGame(friend.id)}
 								/>
 							{/if}
-							<img class="option-icons" src="/write.png" on:click={() => addInstance('Chat', {}, { friendId: friend.id })} />
+							<img class="option-icons" src="/write.png" on:click={() => startChat([friend.id])} />
 							{#if friend.status === 'in-game'}
 								<img
 									class="option-icons"
