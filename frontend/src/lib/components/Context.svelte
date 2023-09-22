@@ -559,15 +559,11 @@
 		const membersIdString = membersId.join(',');
 		const res = await fetchWithToken(`chat/chatId?ids=${membersIdString}`);
 		const data = await res.json();
-		console.log("data");
-		console.log(data);
 		return data.chatId;
 	}
 
 	async function startChat(membersId: number[]) {
 		let chatId : number = await getChatId(membersId);
-		console.log("chatId");
-		console.log(chatId);
 		if (chatId == -1) {
 			console.log("create-chat");
 			const res = await fetchWithToken('chat/create-chat', {

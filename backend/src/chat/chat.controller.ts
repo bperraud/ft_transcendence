@@ -22,12 +22,6 @@ export class ChatController {
     return await this.chatService.getConversation(Number(chatId));
   }
 
-  //  @Get(':chatId')
-  //  async getChatById(@Param('chatId') chatId: string) {
-  //    const chat = await this.chatService.getChatById(Number(chatId));
-  //    return chat;
-  //  }
-
   @Get('chatId')
   async getChatId(
     @GetUser('id') id,
@@ -38,10 +32,9 @@ export class ChatController {
     }
     membersId.push(id);
     const chatId = await this.chatService.getChatId(membersId);
-    //if (chatId.length === 0) {
-    //  return { chatId: -1 };
-    //}
-    //return { chatId: chatId[0] };
+    if (chatId.length === 0) {
+      return { chatId: -1 };
+    }
     return chatId[0];
   }
 

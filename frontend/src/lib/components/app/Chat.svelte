@@ -5,7 +5,6 @@
 
 	const socket = Context.socket();
 	const blocks = Context.blocks();
-	//const chatId = Context.chatId();
 	const fetchChatById = Context.fetchChatById();
 	const chats = Context.chats();
 	const friendInfoId = Context.friendInfoId();
@@ -17,13 +16,12 @@
 	let userId = $user?.id;
 	let chatIdLocal: number ;
 	let currentChat: Context.Message[];
-	//let currentChat: any = null;
+
 	let friendUsername: string | null | undefined = '';
 	let messageContent = '';
 	let isFriend = true;
 	let chatWindow: HTMLDivElement;
 	let autoScroll = true;
-	//let isCreatingChat = false;
 	let blockedIds: number[];
 	let noMember = false;
 	//let friendId: number | null = $friendInfoId;
@@ -35,16 +33,7 @@
 		blockedIds = $blocks.map((block) => block.blockedId);
 		friendUsername = 'patrick' ;
 		//friendUsername = $contacts.find((contact) => contact.id === friendId)?.username;
-		//isFriend = friendUsername != undefined;
-		//if (chatIdLocal !== null && chatIdLocal !== undefined) {
-		//	currentChat = $chats.find((chat) => chat.id === chatIdLocal);
-		//	if (currentChat && currentChat.isGroupChat) isFriend = true;
-		//}
-		//chatIdLocal = chatId;
 
-		//currentChat = $chats.find((chat) => chat.id === chatIdLocal);
-		console.log('chatIdLocal');
-		console.log(chatId);
 		chatIdLocal = chatId;
 	}
 
@@ -123,7 +112,6 @@
 
 	(async () => {
 		currentChat = await fetchConversationById(chatId);
-		console.log(currentChat);
 	})();
 
 </script>
