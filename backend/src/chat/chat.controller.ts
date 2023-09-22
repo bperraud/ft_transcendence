@@ -38,10 +38,11 @@ export class ChatController {
     }
     membersId.push(id);
     const chatId = await this.chatService.getChatId(membersId);
-    if (chatId.length === 0) {
-      return { chatId: -1 };
-    }
-    return { chatId: chatId[0] };
+    //if (chatId.length === 0) {
+    //  return { chatId: -1 };
+    //}
+    //return { chatId: chatId[0] };
+    return chatId[0];
   }
 
   @Get('allUserChats')

@@ -559,15 +559,15 @@
 		const membersIdString = membersId.join(',');
 		const res = await fetchWithToken(`chat/chatId?ids=${membersIdString}`);
 		const data = await res.json();
+		console.log("data");
+		console.log(data);
 		return data.chatId;
 	}
 
 	async function startChat(membersId: number[]) {
-
-		console.log("membersId");
-		console.log(membersId);
 		let chatId : number = await getChatId(membersId);
-
+		console.log("chatId");
+		console.log(chatId);
 		if (chatId == -1) {
 			console.log("create-chat");
 			const res = await fetchWithToken('chat/create-chat', {
@@ -581,9 +581,7 @@
 				})
 			});
 			const data = await res.json();
-			chatId = data.id;
-			console.log(chatId);
-			console.log("startChat");
+			chatId = data.chatId;
 		}
 		addInstance('Chat', {}, { chatId: chatId });
 	}
@@ -677,14 +675,14 @@
 	}
 
 	async function fetchChatById(chatId: number) {
-		const res = await fetchWithToken(`chat/${chatId}`);
-		if (!res.ok) throw new Error(res.statusText);
-		const data = await res.json();
-		return data;
+		//const res = await fetchWithToken(`chat/conversation/${chatId}`);
+		//if (!res.ok) throw new Error(res.statusText);
+		//const data = await res.json();
+		//return data;
 	}
 
 	async function fetchConversationById(chatId: number | null) {
-		const res = await fetchWithToken(`chat/${chatId}`);
+		const res = await fetchWithToken(`chat/conversation/${chatId}`);
 		if (!res.ok) throw new Error(res.statusText);
 		const data = await res.json();
 		return data;

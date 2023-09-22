@@ -15,9 +15,9 @@
 	const fetchUpdateLastMessageRead = Context.fetchUpdateLastMessageRead();
 	const fetchConversationById = Context.fetchConversationById();
 	let userId = $user?.id;
-	//let chatIdLocal: number | null = $chatId;
-	//let currentChat: Context.Message[];
-	let currentChat: any = null;
+	let chatIdLocal: number ;
+	let currentChat: Context.Message[];
+	//let currentChat: any = null;
 	let friendUsername: string | null | undefined = '';
 	let messageContent = '';
 	let isFriend = true;
@@ -29,7 +29,7 @@
 	//let friendId: number | null = $friendInfoId;
 	//export let friendId: number | null = null;
 
-	export let chatIdLocal: number;
+	export let chatId: number;
 
 	$: {
 		blockedIds = $blocks.map((block) => block.blockedId);
@@ -42,7 +42,10 @@
 		//}
 		//chatIdLocal = chatId;
 
-		currentChat = $chats.find((chat) => chat.id === chatIdLocal);
+		//currentChat = $chats.find((chat) => chat.id === chatIdLocal);
+		console.log('chatIdLocal');
+		console.log(chatId);
+		chatIdLocal = chatId;
 	}
 
 	onMount(() => {
@@ -78,15 +81,15 @@
 	}
 
 	async function updateLastMessageRead() {
-		const lastMessage = currentChat?.messages[currentChat?.messages.length - 1];
-		if (lastMessage && lastMessage.userId !== $user?.id) {
-			const chatUser = currentChat.chatUsers.find((user: any) => user.userId === userId);
-			if (chatIdLocal && lastMessage.id !== chatUser.lastReadMessageId && $user?.id) {
-				await fetchUpdateLastMessageRead(chatIdLocal, lastMessage.id, $user?.id);
-				currentChat.chatUsers.find((user: any) => user.userId === userId).lastReadMessageId =
-					lastMessage.id;
-			}
-		}
+		//const lastMessage = currentChat?.messages[currentChat?.messages.length - 1];
+		//if (lastMessage && lastMessage.userId !== $user?.id) {
+		//	const chatUser = currentChat.chatUsers.find((user: any) => user.userId === userId);
+		//	if (chatIdLocal && lastMessage.id !== chatUser.lastReadMessageId && $user?.id) {
+		//		await fetchUpdateLastMessageRead(chatIdLocal, lastMessage.id, $user?.id);
+		//		currentChat.chatUsers.find((user: any) => user.userId === userId).lastReadMessageId =
+		//			lastMessage.id;
+		//	}
+		//}
 	}
 
 	async function sendMessage() {
@@ -119,8 +122,7 @@
 	});
 
 	(async () => {
-		currentChat = await fetchChatById(chatIdLocal);
-
+		currentChat = await fetchConversationById(chatId);
 		console.log(currentChat);
 	})();
 
@@ -135,23 +137,16 @@
 		{/if}
 		<ul>
 			{#if currentChat}
-				{#each currentChat?.messages || [] as message, i (i)}
-					{#if !blockedIds.includes(message.userId)}
-						<li class={message.user?.id === $user?.id ? 'self' : 'other'}>
+				{#each currentChat as message}
+					{#if !blockedIds.includes(message.senderId)}
+						<li class={message.senderId === $user?.id ? 'other' : 'self'}>
 							<div class="message-header">
-								{#if (i > 0 && currentChat?.messages[i - 1] && currentChat?.messages[i - 1].userId != message.userId) || i === 0}
-									<strong on:click={() => openProfile(message.user?.id === $user.id ? null : message.user?.id)}
-										>{message.user?.username}</strong
-									>
-								{/if}
+								<strong on:click={() => openProfile(message.senderId)}
+										>{message.senderId === $user?.id ? friendUsername : $user?.username}</strong>
 							</div>
 							<div class="message-content">{message.content}</div>
 							<h6 class="clock">
-								{#if (i !== currentChat?.messages.length - 1
-									&& formatter.format(new Date(currentChat?.messages[i + 1].createdAt)) !== formatter.format(new Date(currentChat?.messages[i].createdAt)))
-									|| i === currentChat?.messages.length - 1}
-									{formatter.format(new Date(message.createdAt))}
-								{/if}
+								{formatter.format(new Date(message.createdAt))}
 							</h6>
 						</li>
 					{/if}
@@ -160,7 +155,8 @@
 		</ul>
 	</div>
 	<div id="sendMessage-window">
-		{#if isFriend && !noMember}
+		<!--{#if isFriend && !noMember}-->
+		{#if true}
 			<form on:submit|preventDefault={sendMessage} class="send-message-form">
 				<input type="text" bind:value={messageContent} class="message-input" autocomplete="off" />
 				<button type="submit" class="btn send-btn">Send</button>
