@@ -6,15 +6,12 @@
 
 	const socket = Context.socket();
 	const blocks = Context.blocks();
-
-	const contacts = Context.contacts();
 	const selected = Context.selected();
 	const addInstance = Context.addInstance();
 	const fetchUpdateLastMessageRead = Context.fetchUpdateLastMessageRead();
 	const fetchConversationById = Context.fetchConversationById();
 
 	let chatIdLocal: number ;
-	//let currentChat: Context.Message[];
 
 	let currentChat = writable<Context.Message[]>([]);
 	let messageContent = '';
@@ -84,19 +81,6 @@
 
 	async function sendMessage() {
 		if (messageContent.trim() === '') return;
-		//if (!chatIdLocal) {
-		//	const memberUsernames = [$user?.username, friendUsername];
-		//	const groupName = memberUsernames.join('-');
-		//	const chat = await fetchCreateChat(groupName, memberUsernames, false, 'private');
-		//	const chatExists = $chats.some((existingChat) => existingChat.id === chat.id);
-		//	if (!chatExists) {
-		//		//$chats = [...$chats, chat];
-		//		chatIdLocal = chat.id;
-		//		$socket.emit('joinRoom', { chatId: chat.id });
-		//		$socket.emit('otherAddChat', { chat: chat, userId: $user?.id });
-		//		$socket.emit('otherAddChat', { chat: chat, userId: friendId });
-		//	}
-		//}
 		$socket.emit('sendMessage', {
 			chatId: chatIdLocal,
 			userId: $user?.id,
@@ -130,8 +114,10 @@
 					{#if !blockedIds.includes(message.senderId)}
 						<li class={message.senderId === $user?.id ? 'self' : 'other'}>
 							<div class="message-header">
-								<strong on:click={() => openProfile(message.senderId)}
+								{#if (i === 0 || $currentChat[i - 1].senderId !== message.senderId) && message.senderId !== $user?.id}
+									<strong on:click={() => openProfile(message.senderId)}
 										>{message.senderName}</strong>
+								{/if}
 							</div>
 							<div class="message-content">{message.content}</div>
 							<h6 class="clock">
