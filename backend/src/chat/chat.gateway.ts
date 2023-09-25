@@ -92,15 +92,16 @@ export class ChatGateway extends SocketGateway {
     //);
 
     const sendMessage = async () => {
-      const newMessage = await this.chatService.addMessageToDatabase(
+      await this.chatService.addMessageToDatabase(
         chat.id,
-        user.id,
+        userId,
         payload.content,
+        user.username,
       );
-      this.chatService.updateLastMessageRead(chat.id, newMessage.id, user.id);
+      //  this.chatService.updateLastMessageRead(chat.id, newMessage.id, user.id);
       this.server
         .to(`chat-${payload.chatId}`)
-        .emit('message', { chatId: chat.id, message: newMessage });
+        .emit('message', { chatId: chat.id, message: payload.content });
     };
 
     //if (
@@ -121,24 +122,22 @@ export class ChatGateway extends SocketGateway {
   @SubscribeMessage('sendMessage')
   async handleMessage(
     client: Socket,
-    payload: { chatId: number; content: string; userId: number },
+    payload: { chatId: number; content: string },
   ) {
-    //const userId = this.webSocketService.getClientId(client);
+    const userId = this.webSocketService.getClientId(client);
+    const user = await this.userService.getUserById(userId);
 
     const newMessage = await this.chatService.addMessageToDatabase(
       payload.chatId,
-      payload.userId,
+      userId,
       payload.content,
+      user.username,
     );
 
-    //const socket = this.webSocketService.getSocket(payload.friendId);
-
-    //client.emit('message', { friendId: payload.friendId, message: newMessage });
-    //if (socket)
-    //  socket.emit('message', {
-    //    friendId: payload.friendId,
-    //    message: newMessage,
-    //  });
+    this.server.to(`chat-${payload.chatId}`).emit('message', {
+      chatId: payload.chatId,
+      message: newMessage,
+    });
   }
 
   @SubscribeMessage('leaveGroup')

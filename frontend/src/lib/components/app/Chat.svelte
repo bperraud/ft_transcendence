@@ -2,39 +2,33 @@
 	import { onMount, afterUpdate } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
+	import { writable } from 'svelte/store';
 
 	const socket = Context.socket();
 	const blocks = Context.blocks();
-	const fetchChatById = Context.fetchChatById();
-	const chats = Context.chats();
-	const friendInfoId = Context.friendInfoId();
+
 	const contacts = Context.contacts();
 	const selected = Context.selected();
 	const addInstance = Context.addInstance();
 	const fetchUpdateLastMessageRead = Context.fetchUpdateLastMessageRead();
 	const fetchConversationById = Context.fetchConversationById();
-	let userId = $user?.id;
-	let chatIdLocal: number ;
-	let currentChat: Context.Message[];
 
-	let friendUsername: string | null | undefined = '';
+	let chatIdLocal: number ;
+	//let currentChat: Context.Message[];
+
+	let currentChat = writable<Context.Message[]>([]);
 	let messageContent = '';
-	let isFriend = true;
 	let chatWindow: HTMLDivElement;
 	let autoScroll = true;
 	let blockedIds: number[];
 	let noMember = false;
-	//let friendId: number | null = $friendInfoId;
-	//export let friendId: number | null = null;
 
 	export let chatId: number;
 
 	$: {
 		blockedIds = $blocks.map((block) => block.blockedId);
-		friendUsername = 'patrick' ;
-		//friendUsername = $contacts.find((contact) => contact.id === friendId)?.username;
-
 		chatIdLocal = chatId;
+		$currentChat;
 	}
 
 	onMount(() => {
@@ -44,7 +38,18 @@
 		$socket.on('updateGroupChat', () => {
 			noMember = true;
 		});
-		chatWindow.scrollTop = chatWindow.scrollHeight;
+
+		$socket.on('message', (data: { chatId: number; message: Context.Message }) => {
+			console.log('message', data.message.content);
+			if (chatIdLocal === data.chatId) {
+				currentChat.update((chatMessages) => [...chatMessages, data.message]);
+				//chatWindow.scrollTop = chatWindow.scrollHeight;
+			}
+		});
+
+		$socket.emit('joinRoom', { chatId: chatIdLocal });
+
+		//chatWindow.scrollTop = chatWindow.scrollHeight;
 		updateLastMessageRead();
 	});
 
@@ -58,11 +63,7 @@
 	}
 
 	function handleScroll() {
-		if (chatWindow.scrollTop + chatWindow.clientHeight + 1 >= chatWindow.scrollHeight) {
-			autoScroll = true;
-		} else {
-			autoScroll = false;
-		}
+		autoScroll = chatWindow.scrollTop + chatWindow.clientHeight + 1 >= chatWindow.scrollHeight;
 	}
 
 	async function handleClick(event: any) {
@@ -111,30 +112,34 @@
 	});
 
 	(async () => {
-		currentChat = await fetchConversationById(chatId);
+		$currentChat = await fetchConversationById(chatId);
 	})();
 
 </script>
 
 <div id="box" on:click={handleClick}>
 	<div id="chat-window" bind:this={chatWindow} on:scroll={handleScroll}>
-		{#if !currentChat}
+		{#if !$currentChat}
 			<h5>Waiting for messages...</h5>
 		{:else}
 			<h5>▪ End of messages ▪</h5>
 		{/if}
 		<ul>
-			{#if currentChat}
-				{#each currentChat as message}
+			{#if $currentChat}
+				{#each $currentChat as message, i (i)}
 					{#if !blockedIds.includes(message.senderId)}
-						<li class={message.senderId === $user?.id ? 'other' : 'self'}>
+						<li class={message.senderId === $user?.id ? 'self' : 'other'}>
 							<div class="message-header">
 								<strong on:click={() => openProfile(message.senderId)}
-										>{message.senderId === $user?.id ? friendUsername : $user?.username}</strong>
+										>{message.senderName}</strong>
 							</div>
 							<div class="message-content">{message.content}</div>
 							<h6 class="clock">
-								{formatter.format(new Date(message.createdAt))}
+								{#if (i !== $currentChat.length - 1
+									&& formatter.format(new Date($currentChat[i + 1].createdAt)) !== formatter.format(new Date($currentChat[i].createdAt)))
+									|| i === $currentChat.length - 1}
+									{formatter.format(new Date(message.createdAt))}
+								{/if}
 							</h6>
 						</li>
 					{/if}
@@ -217,6 +222,14 @@
 
 	li.other {
 		h6 {
+			margin-top: 0.2rem;
+			margin-right: auto;
+		}
+	}
+
+	li.self {
+		h6 {
+			margin-top: 0.2rem;
 			margin-left: auto;
 		}
 	}

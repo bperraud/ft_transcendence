@@ -77,6 +77,7 @@
 		export type Message = {
 			content : string;
 			senderId : number;
+			senderName : string;
 			createdAt : Date;
 		}
 
@@ -565,12 +566,11 @@
 	async function startChat(membersId: number[]) {
 		let chatId : number = await getChatId(membersId);
 		if (chatId == -1) {
-			console.log("create-chat");
-			const res = await fetchWithToken('chat/create-chat', {
+  			const res = await fetchWithToken('chat/create-chat', {
 				method: 'POST',
 				headers: {
 						'Content-Type': 'application/json'
-				},
+			},
 				body: JSON.stringify({
 					membersId : membersId,
 					accessibility: 'private',
@@ -606,7 +606,6 @@
 		const res = await fetchWithToken('notification/get?type=friend');
 		const data = await res.json();
 		$friendRequest = data;
-		console.log(data);
 		return data;
 	}
 
@@ -877,24 +876,24 @@
 		}
 	});
 
-	$socket.on('message', ({ friendId, message }) => {
-		let targetChatIndex = $chats.findIndex((chat) => chat.id === friendId);
-		if (targetChatIndex !== -1) {
-			let chatscopy = [...$chats];
-			chatscopy[targetChatIndex].messages.push(message);
-			if (message.userId === $user?.id) {
-				let targetChatUserIndex = chatscopy[targetChatIndex].chatUsers.findIndex(
-					(chatUser) => chatUser.userId === $user?.id
-				);
-				if (targetChatUserIndex !== -1) {
-					chatscopy[targetChatIndex].chatUsers[targetChatUserIndex].lastReadMessageId = message.id;
-				}
-			}
-			$chats = chatscopy;
-		} else {
-			console.error(`Received message for unknown chat with id: ${chatId}`);
-		}
-		fetchUnreadConversations();
+	$socket.on('message', ({ chatId, message }) => {
+		//let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
+		//if (targetChatIndex !== -1) {
+		//	let chatscopy = [...$chats];
+		//	chatscopy[targetChatIndex].messages.push(message);
+		//	if (message.userId === $user?.id) {
+		//		let targetChatUserIndex = chatscopy[targetChatIndex].chatUsers.findIndex(
+		//			(chatUser) => chatUser.userId === $user?.id
+		//		);
+		//		if (targetChatUserIndex !== -1) {
+		//			chatscopy[targetChatIndex].chatUsers[targetChatUserIndex].lastReadMessageId = message.id;
+		//		}
+		//	}
+		//	$chats = chatscopy;
+		//} else {
+		//	console.error(`Received message for unknown chat with id: ${chatId}`);
+		//}
+		//fetchUnreadConversations();
 	});
 
 	$socket.on('updateStatus', (data) => {

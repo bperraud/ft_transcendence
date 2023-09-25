@@ -37,9 +37,11 @@ export class ChatService {
   async getConversation(chatId: number) {
     const messages = await this.prisma.$queryRaw<
       Message[]
-    >`SELECT content, "createdAt", "senderId"
-	FROM "public"."Message"
-	WHERE "chatId" = ${chatId}`;
+    >`SELECT content, m."createdAt" as "createdAt", "senderId", "username" as "senderName"
+	FROM "public"."Message" as m
+	JOIN "public"."User" ON "senderId" = "User"."id"
+	WHERE "chatId" = ${chatId}
+	ORDER BY m."createdAt"`;
     console.log('messages');
     console.log(messages);
     return messages;
@@ -102,12 +104,10 @@ export class ChatService {
     chatId: number,
     userId: number,
     content: string,
+    username: string,
   ): Promise<Message> {
-    console.log('addMessageToDatabase');
-    console.log(chatId);
-
     try {
-      const newMessage = await this.prisma.message.create({
+      const messageFromPrisma = await this.prisma.message.create({
         data: {
           content: content,
           sender: {
@@ -116,10 +116,13 @@ export class ChatService {
           chat: {
             connect: { id: chatId },
           },
-          //createdAt: new Date(),
         },
       });
-      return newMessage;
+      const message: Message = {
+        ...messageFromPrisma,
+        senderName: username,
+      };
+      return message;
     } catch (error) {
       console.log(error);
     }

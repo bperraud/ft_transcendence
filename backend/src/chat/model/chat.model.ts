@@ -21,10 +21,10 @@ export type ChatUser = {
 
 export type Message = {
   id: number;
-  createdAt: Date; // Change this from string to Date
-  //  updatedAt: Date; // Likely need to change this too
+  createdAt: Date;
   chatId: number;
   senderId: number;
+  senderName: string;
   content: string;
 };
 
