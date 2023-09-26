@@ -96,9 +96,6 @@ export class FriendService {
           ],
         },
       });
-
-      // notify friend
-      //  await this.notifyFriend(friendId);
       this.notifyFriend(friendId);
     } catch (error) {
       throw new ForbiddenException('Fail to update in database');

@@ -12,7 +12,6 @@
 	const fetchConversationById = Context.fetchConversationById();
 
 	let chatIdLocal: number ;
-
 	let currentChat = writable<Context.Message[]>([]);
 	let messageContent = '';
 	let chatWindow: HTMLDivElement;
@@ -35,18 +34,12 @@
 		$socket.on('updateGroupChat', () => {
 			noMember = true;
 		});
-
 		$socket.on('message', (data: { chatId: number; message: Context.Message }) => {
-			console.log('message', data.message.content);
 			if (chatIdLocal === data.chatId) {
 				currentChat.update((chatMessages) => [...chatMessages, data.message]);
-				//chatWindow.scrollTop = chatWindow.scrollHeight;
 			}
 		});
-
 		$socket.emit('joinRoom', { chatId: chatIdLocal });
-
-		//chatWindow.scrollTop = chatWindow.scrollHeight;
 		updateLastMessageRead();
 	});
 
@@ -103,7 +96,7 @@
 
 <div id="box" on:click={handleClick}>
 	<div id="chat-window" bind:this={chatWindow} on:scroll={handleScroll}>
-		{#if !$currentChat}
+		{#if !$currentChat.length}
 			<h5>Waiting for messages...</h5>
 		{:else}
 			<h5>▪ End of messages ▪</h5>

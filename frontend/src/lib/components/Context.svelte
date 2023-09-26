@@ -861,9 +861,9 @@
 		chats.update((chatsValue) => [...chatsValue, chat]);
 	});
 
-	$socket.on('leaveChat', (chatId) => {
-		$chats = $chats.filter((chat) => chat.id !== chatId);
-	});
+	//$socket.on('leaveChat', (chatId) => {
+	//	$chats = $chats.filter((chat) => chat.id !== chatId);
+	//});
 
 	$socket.on('updateChatName', ({ chatId, newName }) => {
 		let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
@@ -876,25 +876,25 @@
 		}
 	});
 
-	$socket.on('message', ({ chatId, message }) => {
-		//let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
-		//if (targetChatIndex !== -1) {
-		//	let chatscopy = [...$chats];
-		//	chatscopy[targetChatIndex].messages.push(message);
-		//	if (message.userId === $user?.id) {
-		//		let targetChatUserIndex = chatscopy[targetChatIndex].chatUsers.findIndex(
-		//			(chatUser) => chatUser.userId === $user?.id
-		//		);
-		//		if (targetChatUserIndex !== -1) {
-		//			chatscopy[targetChatIndex].chatUsers[targetChatUserIndex].lastReadMessageId = message.id;
-		//		}
-		//	}
-		//	$chats = chatscopy;
-		//} else {
-		//	console.error(`Received message for unknown chat with id: ${chatId}`);
-		//}
-		//fetchUnreadConversations();
-	});
+	//$socket.on('message', ({ chatId, message }) => {
+	//	let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
+	//	if (targetChatIndex !== -1) {
+	//		let chatscopy = [...$chats];
+	//		chatscopy[targetChatIndex].messages.push(message);
+	//		if (message.userId === $user?.id) {
+	//			let targetChatUserIndex = chatscopy[targetChatIndex].chatUsers.findIndex(
+	//				(chatUser) => chatUser.userId === $user?.id
+	//			);
+	//			if (targetChatUserIndex !== -1) {
+	//				chatscopy[targetChatIndex].chatUsers[targetChatUserIndex].lastReadMessageId = message.id;
+	//			}
+	//		}
+	//		$chats = chatscopy;
+	//	} else {
+	//		console.error(`Received message for unknown chat with id: ${chatId}`);
+	//	}
+	//	fetchUnreadConversations();
+	//});
 
 	$socket.on('updateStatus', (data) => {
 		const { friendId, status } = data;

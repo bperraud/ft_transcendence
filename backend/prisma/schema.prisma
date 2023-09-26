@@ -47,19 +47,23 @@ model Match {
 model Relationship {
 	id         Int      @id @default(autoincrement())
 	createdAt  DateTime @default(now())
-	type       String
+	type       Relation
 
-	user1Id  	 Int
-	user2Id  	 Int
+	user1Id    Int
+	user2Id    Int
 	user1      User     @relation("user1", fields: [user1Id], references: [id])
 	user2      User     @relation("user2",fields: [user2Id], references: [id])
 	@@unique([user1Id, user2Id, type])
 }
 
+enum Relation {
+  FRIEND
+}
+
 model Notification {
 	id         Int      @id @default(autoincrement())
 	createdAt  DateTime @default(now())
-	type       String
+	type       Notif
 
 	senderId   Int
 	userId     Int
@@ -68,15 +72,28 @@ model Notification {
 	@@unique([userId, senderId, type])
 }
 
+enum Notif {
+  GAME
+  FRIEND
+}
+
 model Stat {
 	id     Int    @id @default(autoincrement())
 	wins   Int    @default(0)
 	losses Int    @default(0)
 	elo    Int    @default(1000)
-	ladder String @default("silver")
+	ladder Rank   @default(BRONZE)
 
 	userId Int    @unique // relation scalar field (used in the `@relation` attribute above)
 	user   User   @relation(fields: [userId], references: [id])
+}
+
+enum Rank {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+  DIAMOND
 }
 
 model Settings {
@@ -108,22 +125,34 @@ model Chat {
 
 	createdAt     DateTime   @default(now())
 	name          String?    @db.VarChar(30)
-	accessibility String     @default("public")
+	accessibility Access     @default(PUBLIC)
 	password      String?
-
 	messages      Message[]
 	participant	  UserChatRelationship[]
 }
 
+enum Access {
+  PUBLIC
+  PRIVATE
+  PROTECTED
+}
+
 model UserChatRelationship {
 	id            Int        @id @default(autoincrement())
-	createdAt DateTime       @default(now())
-	expiresAt DateTime       @default(now())
-	status    String         @default("default") // admin / ban /mute
+	createdAt 	  DateTime       @default(now())
+	expiresAt 	  DateTime       @default(now())
+	role      	  Role           @default(USER)
 
 	chatId    	  Int
 	userId    	  Int
 	chat          Chat       @relation(fields: [chatId], references: [id], onDelete: Cascade)
 	user          User       @relation(fields: [userId], references: [id])
 	@@unique([userId, chatId])
+}
+
+enum Role {
+  USER
+  ADMIN
+  BAN
+  MUTE
 }

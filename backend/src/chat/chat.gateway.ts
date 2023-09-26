@@ -149,7 +149,7 @@ export class ChatGateway extends SocketGateway {
     const isSuccessful = await this.chatService.leaveGroup(data.chatId, userId);
 
     if (isSuccessful) {
-      client.emit('leaveChat', data.chatId);
+    //  client.emit('leaveChat', data.chatId);
       client.emit('updateGroupChat');
       client.leave(`chat-${data.chatId}`);
     }
