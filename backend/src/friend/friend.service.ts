@@ -7,6 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { WebSocketService } from '../websocket/websocket.service';
 import { UserService } from '../user/user.service';
 import { User } from '@prisma/client';
+import { Notif } from '@prisma/client';
 
 @Injectable()
 export class FriendService {
@@ -40,7 +41,7 @@ export class FriendService {
             ],
           },
           {
-            type: 'friend',
+            type: Notif['FRIEND'],
           },
         ],
       },
@@ -62,7 +63,7 @@ export class FriendService {
           user2: {
             connect: { id: friendId },
           },
-          type: 'friend',
+          type: Notif['FRIEND'],
         },
       });
     } catch (error) {
@@ -91,7 +92,7 @@ export class FriendService {
               ],
             },
             {
-              type: 'friend',
+              type: Notif['FRIEND'],
             },
           ],
         },

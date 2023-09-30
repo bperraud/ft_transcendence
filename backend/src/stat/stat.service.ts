@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Rank } from '@prisma/client';
 import { UpdateStatDto } from './dto';
 import { NotFoundException } from '@nestjs/common';
 import Elo from '@studimax/elo';
@@ -8,17 +8,17 @@ import Elo from '@studimax/elo';
 export class StatService {
   constructor(private prisma: PrismaClient) {}
 
-  updateLadder(playerElo: number): string {
+  updateLadder(playerElo: number): Rank {
     if (playerElo < 1000) {
-      return 'bronze';
+      return 'BRONZE';
     } else if (playerElo <= 1100) {
-      return 'silver';
+      return 'SILVER';
     } else if (playerElo <= 1200) {
-      return 'gold';
+      return 'GOLD';
     } else if (playerElo <= 1300) {
-      return 'platinum';
+      return 'PLATINUM';
     } else if (playerElo <= 1400) {
-      return 'diamond';
+      return 'DIAMOND';
     }
   }
 

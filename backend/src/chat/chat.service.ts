@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Chat, Message } from '../chat/model/chat.model';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class ChatService {
@@ -56,7 +57,7 @@ export class ChatService {
     const newGroupChat = await this.prisma.chat.create({
       data: {
         name: name,
-        accessibility: accessibility,
+        accessibility: Role[accessibility],
         password: password,
       },
     });
@@ -155,10 +156,10 @@ export class ChatService {
       where: {
         OR: [
           {
-            accessibility: 'public',
+            accessibility: Role['PUBLIC'],
           },
           {
-            accessibility: 'protected',
+            accessibility: Role['PROTECTED'],
           },
         ],
       },
@@ -174,7 +175,10 @@ export class ChatService {
 
     const totalChatsCount = await this.prisma.chat.count({
       where: {
-        OR: [{ accessibility: 'public' }, { accessibility: 'protected' }],
+        OR: [
+          { accessibility: Role['PUBLIC'] },
+          { accessibility: Role['PROTECTED'] },
+        ],
       },
     });
 
@@ -200,13 +204,13 @@ export class ChatService {
     isProtected: boolean,
     password?: string,
   ): Promise<void> {
-    const accessibility = isProtected ? 'public' : 'protected';
+    const accessibility = isProtected ? Role['PUBLIC'] : Role['PROTECTED'];
     const updateData = { accessibility };
     if (password !== undefined) updateData['password'] = password;
 
     await this.prisma.chat.update({
       where: { id: chatId },
-      data: updateData,
+      data: accessibility,
     });
   }
 
