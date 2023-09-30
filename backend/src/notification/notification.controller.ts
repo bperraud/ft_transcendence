@@ -3,7 +3,7 @@ import { JwtGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { FriendDto } from 'src/friend/dto';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Notif } from '@prisma/client';
 import { NotificationService } from './notification.service';
 import { ResponseDto } from './dto';
 import { WebSocketService } from 'src/websocket/websocket.service';
@@ -34,13 +34,17 @@ export class NotificationController {
     return await this.notifService.notifyEvent(
       prisma_friend.id,
       user.id,
-      'friend',
+      Notif['FRIEND'],
     );
   }
 
   @Post('friend-response')
   async responseFriend(@GetUser('id') id, @Body() dto: ResponseDto) {
-    await this.notifService.removeNotification(id, dto.friendId, 'friend');
+    await this.notifService.removeNotification(
+      id,
+      dto.friendId,
+      Notif['FRIEND'],
+    );
     if (dto.response) {
       await this.friendService.addFriend(id, dto.friendId);
       return { message: 'accepted' };
@@ -63,11 +67,14 @@ export class NotificationController {
   @Get('get')
   async getNotification(@GetUser('id') id, @Query('type') type: string) {
     try {
+      if (!Notif[type]) {
+        throw new Error('Invalid notification type');
+      }
       const notificationUser = await this.prisma.$queryRaw<
         User[]
       >`SELECT id, username FROM "public"."User" WHERE id IN (
 		  SELECT "senderId" FROM "public"."Notification" WHERE "userId" = ${id}
-		  AND type = ${type}
+		  AND "type" = ${type}::"Notif"
 		)`;
       return notificationUser;
     } catch (error) {

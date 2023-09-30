@@ -12,12 +12,12 @@ export class NotificationService {
     private userService: UserService,
   ) {}
 
-  async notifyEvent(friendId: number, userId: number, message: string) {
+  async notifyEvent(friendId: number, userId: number, notification: Notif) {
     try {
       const firstNotif = await this.prisma.notification.findFirst({
         where: {
           senderId: userId,
-          type: Notif[message],
+          type: notification,
           userId: friendId,
         },
       });
@@ -38,11 +38,11 @@ export class NotificationService {
               id: userId,
             },
           },
-          type: Notif[message],
+          type: notification,
         },
       });
       if ((await this.userService.getUserStatus(friendId)) != 'offline') {
-        this.socketService.sendToUser(friendId, '', message);
+        this.socketService.sendToUser(friendId, '', notification.toString());
       }
       return notif;
     } catch (error) {
@@ -50,19 +50,19 @@ export class NotificationService {
     }
   }
 
-  async removeNotification(userId: number, friendId: number, message: string) {
+  async removeNotification(userId: number, friendId: number, message: Notif) {
     try {
       const userToNotify = await this.prisma.notification.findMany({
         where: {
           senderId: friendId,
-          type: Notif[message],
+          type: message,
         },
       });
       await this.prisma.notification.deleteMany({
         where: {
           userId: userId,
           senderId: friendId,
-          type: Notif[message],
+          type: message,
         },
       });
       return userToNotify.map((item) => item.userId);

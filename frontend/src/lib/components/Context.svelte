@@ -603,7 +603,7 @@
 	}
 
 	async function fetchFriendRequest() {
-		const res = await fetchWithToken('notification/get?type=friend');
+		const res = await fetchWithToken('notification/get?type=FRIEND');
 		const data = await res.json();
 		$friendRequest = data;
 		return data;
