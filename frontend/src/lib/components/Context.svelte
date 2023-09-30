@@ -801,7 +801,7 @@
 		$serverClockDelta = data[1] - Date.now() + $ping / 2;
 	});
 
-	$socket.on('friend', (data: { message: string }) => {
+	$socket.on('FRIEND', (data: { message: string }) => {
 		fetchFriendRequest();
 		fetchFriends();
 		fetchMe();
