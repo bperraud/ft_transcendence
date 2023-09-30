@@ -1,38 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Chat, Message } from '../chat/model/chat.model';
+import { Message } from '../chat/model/chat.model';
 import { Role } from '@prisma/client';
 
 @Injectable()
 export class ChatService {
   constructor(private prisma: PrismaService) {}
 
-  async getAllUserChats(username: string): Promise<Chat[]> {
-    //const chats = await this.prisma.chat.findMany({
-    //  where: {
-    //    chatUsers: {
-    //      some: {
-    //        user: {
-    //          username: username,
-    //        },
-    //      },
-    //    },
-    //  },
-    //  include: {
-    //    messages: {
-    //      include: {
-    //        user: true,
-    //      },
-    //    },
-    //    chatUsers: {
-    //      include: {
-    //        user: true,
-    //      },
-    //    },
-    //  },
-    //});
-    const chats: Chat[] = [];
-    return chats;
+  async lastConversationMessages(userId: number) {
+    const messages = await this.prisma.$queryRaw<Message[]>`SELECT m.content,
+	m."createdAt",
+	m."senderId",
+	u.username as "senderName"
+	FROM "public"."Message" as m
+	JOIN "public"."User" as u ON m."senderId" = u."id"
+	WHERE (m."createdAt", m."chatId") IN (
+	SELECT MAX("createdAt"), "chatId"
+	FROM "public"."Message"
+	WHERE "chatId" IN (
+		SELECT "chatId"
+		FROM "public"."UserChatRelationship"
+		WHERE "userId" = ${userId}
+	)
+	GROUP BY "chatId"
+	)`;
+    return messages;
   }
 
   async getConversation(chatId: number) {
@@ -43,8 +35,6 @@ export class ChatService {
 	JOIN "public"."User" ON "senderId" = "User"."id"
 	WHERE "chatId" = ${chatId}
 	ORDER BY m."createdAt"`;
-    console.log('messages');
-    console.log(messages);
     return messages;
   }
 

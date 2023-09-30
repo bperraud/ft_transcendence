@@ -636,11 +636,12 @@
 	}
 
 	async function fetchChats() {
-		//const res = await fetchWithToken('chat/allUserChats');
-		//const data = await res.json();
-		//$chats = data;
-		//await fetchUnreadConversations();
-		//return data;
+		console.log('fetchChats');
+		const res = await fetchWithToken('chat/lastConversationMessages');
+		const data = await res.json();
+		$chats = data;
+		await fetchUnreadConversations();
+		return data;
 	}
 
 	async function fetchCreateChat(

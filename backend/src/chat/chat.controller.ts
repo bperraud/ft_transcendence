@@ -38,9 +38,10 @@ export class ChatController {
     return chatId[0];
   }
 
-  @Get('allUserChats')
-  async getAllUserChats(@GetUser() user) {
-    const chats = await this.chatService.getAllUserChats(user.username);
+  @Get('lastConversationMessages')
+  async getAllUserChats(@GetUser('id') id) {
+    const chats = await this.chatService.lastConversationMessages(id);
+    console.log(chats);
     return chats;
   }
 

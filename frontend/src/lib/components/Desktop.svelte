@@ -68,11 +68,13 @@
 		await fetchGetUserBlocks();
 		await fetchFriendRequest();
 
-		fetchChats().then(() => {
-			$chats.forEach((chat) => {
-				if (chat.isGroupChat) $socket.emit('joinRoom', { chatId: chat.id });
-			});
-		});
+		await fetchChats();
+
+		//fetchChats().then(() => {
+		//	$chats.forEach((chat) => {
+		//		if (chat.isGroupChat) $socket.emit('joinRoom', { chatId: chat.id });
+		//	});
+		//});
 	})();
 
 	const notVisible = new Set(['FriendRequest', 'Chat', 'ChatForum', 'EditProfile', 'PongKeybinds']);

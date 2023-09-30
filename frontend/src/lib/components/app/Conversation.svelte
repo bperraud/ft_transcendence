@@ -7,6 +7,7 @@
 
 	const chats = Context.chats();
 	const blocks = Context.blocks();
+	const fetchChats = Context.fetchChats();
 	const getUnreadMessagesCount = Context.getUnreadMessagesCount();
 	let now = new Date();
 	let blockedIds = writable<number[]>([]);
@@ -17,6 +18,7 @@
 
 	$: {
 		blockedIds.set($blocks.map((block) => block.blockedId));
+		fetchChats();
 	}
 
 	onDestroy(() => {
