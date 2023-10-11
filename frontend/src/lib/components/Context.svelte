@@ -111,7 +111,7 @@
 		export const unreadConversations = (): Writable<number> => getContext('unreadConversations');
 		export const fetchUnreadConversations = (): (() => Promise<number>) =>
 			getContext('fetchUnreadConversations');
-
+		export const lastMessages = (): Writable<Message[]> => getContext('lastMessages');
 		export interface Settings {
 			pong: {
 				up: string;
@@ -291,7 +291,6 @@
 	import { onDestroy } from 'svelte';
 	import { v4 as uuidv4 } from 'uuid';
 	import { logout } from '$lib/utils/connect';
-	import { dataset_dev } from 'svelte/internal';
 
 	let intervals: number[] = [];
 
@@ -338,6 +337,7 @@
 	const chatsPublic = writable<Context.Chat[]>([]);
 	const chatId = writable<number | null>(null);
 	const openChatForumWindow = writable(false);
+	const lastMessages = writable<Context.Message[]>([]);
 
 	setContext('contacts', contacts);
 	setContext('blocks', blocks);
@@ -352,6 +352,7 @@
 	setContext('chatsPublic', chatsPublic);
 	setContext('chatId', chatId);
 	setContext('openChatForumWindow', openChatForumWindow);
+	setContext('lastMessages', lastMessages);
 
 	const settings = writable<Context.Settings>({
 		pong: {
@@ -573,7 +574,7 @@
 			},
 				body: JSON.stringify({
 					membersId : membersId,
-					accessibility: 'private',
+					accessibility: 'PRIVATE',
 				})
 			});
 			const data = await res.json();
@@ -639,7 +640,7 @@
 		console.log('fetchChats');
 		const res = await fetchWithToken('chat/lastConversationMessages');
 		const data = await res.json();
-		$chats = data;
+		$lastMessages = data;
 		await fetchUnreadConversations();
 		return data;
 	}

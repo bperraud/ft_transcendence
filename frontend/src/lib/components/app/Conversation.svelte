@@ -6,6 +6,7 @@
 	import NotificationBadge from '$lib/components/NotificationBadge.svelte';
 
 	const chats = Context.chats();
+	const lastMessages = Context.lastMessages();
 	const blocks = Context.blocks();
 	const fetchChats = Context.fetchChats();
 	const getUnreadMessagesCount = Context.getUnreadMessagesCount();
@@ -24,19 +25,6 @@
 	onDestroy(() => {
 		clearInterval(intervalId);
 	});
-
-
-	function getLastMessageSender(chat: any) {
-		if (chat.messages.length > 0) {
-			return chat.messages[chat.messages.length - 1].user?.username;
-		} else {
-			return 'No messages yet';
-		}
-	}
-
-	function getFriendId(chat: any) {
-		return chat.chatUsers.find((c: any) => c.userId !== $user?.id)?.user?.id;
-	}
 
 	function timeDifference(current: Date, previous: Date) {
 		const msPerMinute = 60 * 1000;
@@ -58,18 +46,13 @@
 
 <div id="box">
 	<div id="chat-window">
-		{#each $chats.sort((chatA, chatB) => {
-			const dateA = new Date(chatA.messages.length > 0 ? chatA.messages[chatA.messages.length - 1].createdAt : chatA.createdAt);
-			const dateB = new Date(chatB.messages.length > 0 ? chatB.messages[chatB.messages.length - 1].createdAt : chatB.createdAt);
-			return dateB.getTime() - dateA.getTime();
-		}) as chat, i (i)}
-			{#if chat.accessibility === 'private'}
-			<!--addInstance('Chat', {}, { friendId: friend.id })-->
-				<div class="chat" on:click={() => chat }>
+		{#each $lastMessages as conversation, i (i)}
+			<!--addInstance('conversation', {}, { friendId: friend.id })-->
+				<div class="chat" on:click={() => conversation }>
 					<div class="chat-header">
-						{#if chat.isGroupChat}
+						<!--{#if conversation.isGroupChat}
 							<h4>
-								{chat.name}
+								{conversation.name}
 								<h5>
 									{#each chat.chatUsers as chatUser, i}
 										{#if chatUser.user.username != $user?.username}
@@ -78,44 +61,44 @@
 									{/each}
 								</h5>
 							</h4>
-						{:else}
-							<h4>
-								{chat.chatUsers.find((chatUser) => chatUser.userId !== $user?.id)?.user?.username}
-							</h4>
-						{/if}
+						{:else}-->
+						<h4>
+							{conversation.senderName}
+						</h4>
+						<!--{/if}-->
 					</div>
 					<div class="chat-content">
-						{#if chat.messages.length > 0}
+						{#if $lastMessages.length > 0}
 							<div class="message-details">
 								<p>
-									{#if !$blockedIds.includes(getFriendId(chat))}
+									<!--{#if !$blockedIds.includes(getFriendId(chat))}
 									{chat.messages[chat.messages.length - 1].userId === $user?.id
 										? 'you'
 										: getLastMessageSender(chat)}
 									: { chat.messages[chat.messages.length - 1].content }
 								{:else}
 									{ 'blocked' }
-								{/if}
+								{/if}-->
+									{conversation.senderId === $user?.id ? 'you' : conversation.senderName} :  { conversation.content}
 								</p>
 								<span class="timestamp"
 									>{timeDifference(
 										now,
-										new Date(chat.messages[chat.messages.length - 1].createdAt)
+										new Date(conversation.createdAt)
 									)}</span
 								>
 							</div>
 							<p class="notification-badge">
-								<NotificationBadge count={getUnreadMessagesCount(
+								<!--<NotificationBadge count={getUnreadMessagesCount(
 									chat,
 									chat.chatUsers.find((chatUser) => chatUser.userId === $user?.id)
-								)} />
+								)} />-->
 							</p>
 						{:else}
 							<p>No messages yet</p>
 						{/if}
 					</div>
 				</div>
-			{/if}
 		{/each}
 	</div>
 </div>

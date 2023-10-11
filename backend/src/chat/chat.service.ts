@@ -14,16 +14,20 @@ export class ChatService {
 	u.username as "senderName"
 	FROM "public"."Message" as m
 	JOIN "public"."User" as u ON m."senderId" = u."id"
-	WHERE (m."createdAt", m."chatId") IN (
-	SELECT MAX("createdAt"), "chatId"
-	FROM "public"."Message"
-	WHERE "chatId" IN (
-		SELECT "chatId"
-		FROM "public"."UserChatRelationship"
-		WHERE "userId" = ${userId}
+	JOIN "public"."Chat" as chat ON m."chatId" = chat."id"
+	WHERE chat.accessibility = 'PRIVATE'::"Access"
+	AND (m."createdAt", m."chatId") IN (
+		SELECT MAX("createdAt"), "chatId"
+		FROM "public"."Message"
+		WHERE "chatId" IN (
+			SELECT "chatId"
+			FROM "public"."UserChatRelationship"
+			WHERE "userId" = ${userId}
+		)
+		GROUP BY "chatId"
 	)
-	GROUP BY "chatId"
-	)`;
+	`;
+    console.log(messages);
     return messages;
   }
 
