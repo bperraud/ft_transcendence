@@ -31,8 +31,8 @@ export type MessagePreview = {
   createdAt: Date;
   chatId: number;
   chatName: string;
-  friendId: number;
-  friendName: string;
+//  friendId: number;
+//  friendName: string;
   senderId: number;
   senderName: string;
   content: string;

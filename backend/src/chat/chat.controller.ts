@@ -41,6 +41,7 @@ export class ChatController {
   @Get('lastConversationMessages')
   async getAllUserChats(@GetUser('id') id) {
     const chats = await this.chatService.lastConversationMessages(id);
+    console.log('lastConversation');
     console.log(chats);
     return chats;
   }

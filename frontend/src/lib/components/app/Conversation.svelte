@@ -63,7 +63,7 @@
 							</h4>
 						{:else}-->
 					<h4>
-						{conversation.friendName}
+						{conversation.chatName}
 					</h4>
 						<!--{/if}-->
 				</div>

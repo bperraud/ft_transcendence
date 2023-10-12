@@ -10,13 +10,13 @@ export class ChatService {
   async lastConversationMessages(userId: number) {
     const messages = await this.prisma.$queryRaw<
       MessagePreview[]
-    >`SELECT m.content,
+    >`SELECT DISTINCT ON (m."chatId")
+    m.content,
 	m."createdAt",
 	m."senderId",
 	m."chatId",
-	chat.name as "chatName",
+	COALESCE(chat.name, friend.username) as "chatName",
 	relation."userId" as "friendId",
-	friend.username as "friendName",
 	u.username as "senderName"
 	FROM "public"."Message" as m
 	JOIN "public"."User" as u ON m."senderId" = u."id"

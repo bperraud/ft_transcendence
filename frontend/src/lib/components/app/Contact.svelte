@@ -8,9 +8,6 @@
 	const fetchWithToken = Context.fetchWithToken();
 	const fetchFriends = Context.fetchFriends();
 	const fetchMe = Context.fetchMe();
-	const fetchCreateChat = Context.fetchCreateChat();
-	const chats = Context.chats();
-	const chatId = Context.chatId();
 	const contacts = Context.contacts();
 	const friendRequest = Context.friendRequest();
 	const openPongWindow = Context.openPongWindow();
@@ -18,6 +15,7 @@
 	const selected = Context.selected();
 	const askGame = Context.askGame();
 	const startChat = Context.startChat();
+	const createGroupChat = Context.createGroupChat();
 
 	let selectedFriends: Context.Contact[] = [];
 	let friendInput: string = '';
@@ -68,24 +66,10 @@
 		else selectedFriends = [...selectedFriends, friend];
 	}
 
-	async function createGroupChat() {
-		//const memberUsernames = selectedFriends.map(friend => friend.username);
-		//memberUsernames.push($user?.username);
-		//const groupName = memberUsernames.join(', ');
-
-		//const chat = await fetchCreateChat(groupName, memberUsernames, true, 'private');
-		//if (chat) {
-		//	$chats = [...$chats, chat];
-		//	$chatId = chat.id;
-		//	$socket.emit('joinRoom', { chatId: chat.id });
-		//	selectedFriends.forEach(friend => {
-		//		$socket.emit('otherAddChat', { chat: chat, userId: friend.id });
-		//	});
-		//	$chatId = chat.id;
-		//	// open group window
-		//	//addInstance('Chat', {}, { chatId: chat.id });
-		//}
-		//startChat(selectedFriends);
+	async function createGroup() {
+		const memberUsernames = selectedFriends.map(friend => friend.username);
+		memberUsernames.push($user?.username);
+		createGroupChat(selectedFriends.map(item => item.id), memberUsernames.join(', '));
 		toggleGroupChatMode();
 	}
 
@@ -190,7 +174,7 @@
 	<div class="centered-buttons">
 		<button on:click={toggleGroupChatMode}>{groupChatMode ? 'Cancel' : 'Create Group Chat'}</button>
 		{#if groupChatMode && selectedFriends.length > 0}
-			<button on:click={createGroupChat}>Confirm</button>
+			<button on:click={createGroup}>Confirm</button>
 		{/if}
 		<span class="notification-badge">
 			<NotificationBadge count={$friendRequest.length} />

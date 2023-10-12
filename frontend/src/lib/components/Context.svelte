@@ -38,15 +38,6 @@
 		//	userId: number;
 		//};
 
-		//export type Conversation = {
-		//	//id: number;
-		//	friendId: number;
-		//	messages: Message[];
-		//	//createdAt: string;
-		//	//updatedAt: string;
-		//	//userId: number;
-		//}
-
 		export type Chat = {
 			chatUsers: ChatUser[];
 			messages: Message[];
@@ -73,7 +64,7 @@
 			chatId : number;
 			senderId : number;
 			senderName : string;
-			friendName: string;
+			chatName: string;
 			createdAt : Date;
 		}
 
@@ -176,6 +167,7 @@
 
 		export const askGame = (): ((friendId: number) => string) => getContext('askGame');
 		export const startChat = (): ((membersId: number[]) => void) => getContext('startChat');
+		export const createGroupChat = (): ((membersId: number[], groupName : string) => void) => getContext('createGroupChat');
 
 		export const fetchHistory = (): (() => Promise<any>) => getContext('fetchHistory');
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
@@ -432,6 +424,7 @@
 	setContext('removeInstance', removeInstance);
 	setContext('askGame', askGame);
 	setContext('startChat', startChat);
+	setContext('createGroupChat', createGroupChat);
 
 	const apps = readable<Record<Context.App, Context.AppProps>>({
 		Profile: {
@@ -578,6 +571,24 @@
 		}
 		addInstance('Chat', {}, { chatId: chatId });
 	}
+
+	async function createGroupChat(membersId: number[], groupName : string) {
+  		const res = await fetchWithToken('chat/create-chat', {
+			method: 'POST',
+			headers: {
+					'Content-Type': 'application/json'
+		},
+			body: JSON.stringify({
+				membersId : membersId,
+				accessibility: 'PRIVATE',
+				name: groupName
+			})
+		});
+		const data = await res.json();
+		const chatId = data.chatId;
+		addInstance('Chat', {}, { chatId: chatId });
+	}
+
 
 	async function fetchUserById(id: number) {
 		const res = await fetchWithToken(`users/info/${id}`);
