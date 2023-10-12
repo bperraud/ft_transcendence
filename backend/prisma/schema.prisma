@@ -30,8 +30,6 @@ model User {
 	senderNotif		    Notification[]  @relation("sender")
 }
 
-// create table relationship instead with status ( pending, accepted, blocked, mute )
-
 model Match {
 	id          Int      @id @default(autoincrement())
 	createdAt   DateTime @default(now())

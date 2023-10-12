@@ -15,7 +15,6 @@
 	const selected = Context.selected();
 	const askGame = Context.askGame();
 	const startChat = Context.startChat();
-	const createGroupChat = Context.createGroupChat();
 
 	let selectedFriends: Context.Contact[] = [];
 	let friendInput: string = '';
@@ -66,10 +65,11 @@
 		else selectedFriends = [...selectedFriends, friend];
 	}
 
-	async function createGroup() {
+	async function createGroupChat() {
 		const memberUsernames = selectedFriends.map(friend => friend.username);
+		const ids = selectedFriends.map(item => item.id);
 		memberUsernames.push($user?.username);
-		createGroupChat(selectedFriends.map(item => item.id), memberUsernames.join(', '));
+		startChat(ids, memberUsernames.join(', '));
 		toggleGroupChatMode();
 	}
 
@@ -174,7 +174,7 @@
 	<div class="centered-buttons">
 		<button on:click={toggleGroupChatMode}>{groupChatMode ? 'Cancel' : 'Create Group Chat'}</button>
 		{#if groupChatMode && selectedFriends.length > 0}
-			<button on:click={createGroup}>Confirm</button>
+			<button on:click={createGroupChat}>Confirm</button>
 		{/if}
 		<span class="notification-badge">
 			<NotificationBadge count={$friendRequest.length} />

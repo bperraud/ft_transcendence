@@ -50,22 +50,7 @@
 		{#each $lastMessages as conversation, i (i)}
 			<div class="chat" on:click={() => addInstance('Chat', {}, { chatId: conversation.chatId })}>
 				<div class="chat-header">
-						<!--{#if conversation.isGroupChat}
-							<h4>
-								{conversation.name}
-								<h5>
-									{#each chat.chatUsers as chatUser, i}
-										{#if chatUser.user.username != $user?.username}
-											{chatUser.user.username + (chat.chatUsers.length - 1 - i > 1 ? ', ' : '')}
-										{/if}
-									{/each}
-								</h5>
-							</h4>
-						{:else}-->
-					<h4>
-						{conversation.chatName}
-					</h4>
-						<!--{/if}-->
+					<h4>{conversation.chatName}</h4>
 				</div>
 				<div class="chat-content">
 					{#if $lastMessages.length > 0}

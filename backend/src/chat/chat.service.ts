@@ -82,12 +82,11 @@ export class ChatService {
     return newGroupChat.id;
   }
 
-  async getChatId(membersId: string[]): Promise<number[]> {
-    const ids = membersId.map((str) => BigInt(str));
+  async getChatId(membersId: number[]): Promise<number[]> {
     const len = membersId.length;
     const chatId = await this.prisma.$queryRaw<number[]>` SELECT "chatId"
 	  FROM "public"."UserChatRelationship"
-	  WHERE "userId" = ANY(${ids}::bigint[])
+	  WHERE "userId" = ANY(${membersId})
 	  GROUP BY "chatId"
 	  HAVING COUNT(DISTINCT "userId") = ${len}`;
     return chatId;

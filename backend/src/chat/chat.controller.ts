@@ -23,15 +23,10 @@ export class ChatController {
   }
 
   @Get('chatId')
-  async getChatId(
-    @GetUser('id') id,
-    @Query('ids') membersId: string | string[],
-  ) {
-    if (!Array.isArray(membersId)) {
-      membersId = [membersId];
-    }
-    membersId.push(id);
-    const chatId = await this.chatService.getChatId(membersId);
+  async getChatId(@GetUser('id') id, @Query('ids') membersId: string) {
+    const memberIdsArray = membersId.split(',').map((id) => parseInt(id, 10));
+    memberIdsArray.push(id);
+    const chatId = await this.chatService.getChatId(memberIdsArray);
     if (chatId.length === 0) {
       return { chatId: -1 };
     }

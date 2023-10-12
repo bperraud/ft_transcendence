@@ -166,9 +166,7 @@
 		export const removeInstance = (): ((id: string) => void) => getContext('removeInstance');
 
 		export const askGame = (): ((friendId: number) => string) => getContext('askGame');
-		export const startChat = (): ((membersId: number[]) => void) => getContext('startChat');
-		export const createGroupChat = (): ((membersId: number[], groupName : string) => void) => getContext('createGroupChat');
-
+		export const startChat = (): ((membersId: number[], groupName? :string) => void) => getContext('startChat');
 		export const fetchHistory = (): (() => Promise<any>) => getContext('fetchHistory');
 		export const fetchMe = (): (() => Promise<any>) => getContext('fetchMe');
 		export const fetchUserByUsername = (): ((username: string) => Promise<any>) =>
@@ -424,7 +422,6 @@
 	setContext('removeInstance', removeInstance);
 	setContext('askGame', askGame);
 	setContext('startChat', startChat);
-	setContext('createGroupChat', createGroupChat);
 
 	const apps = readable<Record<Context.App, Context.AppProps>>({
 		Profile: {
@@ -553,7 +550,7 @@
 		return data.chatId;
 	}
 
-	async function startChat(membersId: number[]) {
+	async function startChat(membersId: number[], groupName? : string) {
 		let chatId : number = await getChatId(membersId);
 		if (chatId == -1) {
   			const res = await fetchWithToken('chat/create-chat', {
@@ -564,6 +561,7 @@
 				body: JSON.stringify({
 					membersId : membersId,
 					accessibility: 'PRIVATE',
+					name: groupName
 				})
 			});
 			const data = await res.json();
@@ -571,24 +569,6 @@
 		}
 		addInstance('Chat', {}, { chatId: chatId });
 	}
-
-	async function createGroupChat(membersId: number[], groupName : string) {
-  		const res = await fetchWithToken('chat/create-chat', {
-			method: 'POST',
-			headers: {
-					'Content-Type': 'application/json'
-		},
-			body: JSON.stringify({
-				membersId : membersId,
-				accessibility: 'PRIVATE',
-				name: groupName
-			})
-		});
-		const data = await res.json();
-		const chatId = data.chatId;
-		addInstance('Chat', {}, { chatId: chatId });
-	}
-
 
 	async function fetchUserById(id: number) {
 		const res = await fetchWithToken(`users/info/${id}`);
@@ -850,25 +830,7 @@
 		}
 	});
 
-	//$socket.on('message', ({ chatId, message }) => {
-	//	let targetChatIndex = $chats.findIndex((chat) => chat.id === chatId);
-	//	if (targetChatIndex !== -1) {
-	//		let chatscopy = [...$chats];
-	//		chatscopy[targetChatIndex].messages.push(message);
-	//		if (message.userId === $user?.id) {
-	//			let targetChatUserIndex = chatscopy[targetChatIndex].chatUsers.findIndex(
-	//				(chatUser) => chatUser.userId === $user?.id
-	//			);
-	//			if (targetChatUserIndex !== -1) {
-	//				chatscopy[targetChatIndex].chatUsers[targetChatUserIndex].lastReadMessageId = message.id;
-	//			}
-	//		}
-	//		$chats = chatscopy;
-	//	} else {
-	//		console.error(`Received message for unknown chat with id: ${chatId}`);
-	//	}
-	//	fetchUnreadConversations();
-	//});
+
 
 	$socket.on('updateStatus', (data) => {
 		const { friendId, status } = data;
