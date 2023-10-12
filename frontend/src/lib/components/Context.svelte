@@ -473,7 +473,7 @@
 			DesktopProps: { name: 'EditProfile', icon: '/computer.png' }
 		},
 		Prompt : {
-			TabProps: { name: 'Command Prompt', icon: '/shell.png' },
+			TabProps: { name: 'MS-DOS Prompt', icon: '/shell.png' },
 			DesktopProps: { name: 'Prompt', icon: '/shell.png' }
 
 		},

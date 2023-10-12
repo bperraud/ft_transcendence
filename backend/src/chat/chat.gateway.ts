@@ -66,7 +66,7 @@ export class ChatGateway extends SocketGateway {
     payload: { chat: any; userId: number },
   ) {
     const { chat, userId } = payload;
-    const socket = await this.webSocketService.getSocket(userId);
+    const socket = this.webSocketService.getSocket(userId);
 
     if (socket) {
       socket.join(`chat-${chat.id}`);
@@ -180,7 +180,7 @@ export class ChatGateway extends SocketGateway {
   ) {
     const { chatId, userId, duration } = payload;
     const expiresAt = await this.chatService.banUser(chatId, userId, duration);
-    const socket = await this.webSocketService.getSocket(userId);
+    const socket = this.webSocketService.getSocket(userId);
     if (socket) socket.emit('userBan', { chatId, expiresAt });
 
     return;
@@ -208,7 +208,7 @@ export class ChatGateway extends SocketGateway {
   ) {
     const { chatId, userId, duration } = payload;
     const expiresAt = await this.chatService.muteUser(chatId, userId, duration);
-    const socket = await this.webSocketService.getSocket(userId);
+    const socket = this.webSocketService.getSocket(userId);
     if (socket) socket.emit('userMute', { chatId, expiresAt });
 
     return;

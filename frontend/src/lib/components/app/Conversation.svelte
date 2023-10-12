@@ -5,7 +5,6 @@
 	import { Context } from '$lib/components/Context.svelte';
 	import NotificationBadge from '$lib/components/NotificationBadge.svelte';
 
-	const chats = Context.chats();
 	const lastMessages = Context.lastMessages();
 	const addInstance = Context.addInstance();
 	const blocks = Context.blocks();
@@ -74,10 +73,7 @@
 							>
 						</div>
 						<p class="notification-badge">
-								<!--<NotificationBadge count={getUnreadMessagesCount(
-									chat,
-									chat.chatUsers.find((chatUser) => chatUser.userId === $user?.id)
-								)} />-->
+								<!--<NotificationBadge count={getUnreadMessagesCount(conversation.chatId)} />-->
 						</p>
 					{:else}
 						<p>No messages yet</p>

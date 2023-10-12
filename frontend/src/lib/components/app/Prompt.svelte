@@ -1,10 +1,9 @@
 <script lang="ts">
 	import DropDown from '$lib/components/drop/DropDown.svelte';
-	import { writable } from 'svelte/store';
 
 	let input = '';
 
-	let textareaValue = writable('');
+	let textareaValue = '';
 
 	function clear() {
 		input = '';
@@ -22,13 +21,20 @@
 		return res;
 	}
 
+	function handleKeyDown(e: KeyboardEvent) {
+		if (e.key === 'Enter') {
+			run_cmd(input);
+			clear();
+		}
+	}
+
 	async function run_cmd(input: string) {
 		const encodedInput = encodeURIComponent(input);
 		const res = await fetchWithTokenWebServer(`minishell/?${encodedInput}`, {
 			method: 'GET'
 		});
 		const data = await res.text();
-		$textareaValue = data;
+		textareaValue += data;
 		console.log(data);
 	}
 
@@ -53,9 +59,9 @@
 		</DropDown>
 	</div>
 	<div class="content">
-		<p>{$textareaValue}</p>
-		<input type="text" bind:value={input} class="message-input"/>
-		<button on:click={run_cmd(input)}>Send</button>
+		<p>{textareaValue}</p>
+		<!--<p bind:value={textareaValue} readonly/>-->
+		<input type="text" bind:value={input} class="message-input" on:keydown={handleKeyDown}/>
 	</div>
 </div>
 
@@ -76,18 +82,38 @@
 	}
 
 	div.content {
+
 		margin-left: 0.2rem;
 		margin-right: 0.2rem;
+
 		p {
+			font-size: 1.1rem;
 			white-space: pre-line;
 			min-height: 80px;
 			min-width: 150px;
 			padding-top: 0.2rem;
 			padding-left: 0.2rem;
-			font-size: 1.1rem;
 			outline: none;
 			height: 30rem;
 			width: 50rem;
+			background-color: #000;
+			color: white;
+			overflow-y: auto;
 		}
+
+		.message-input {
+			font-size: 1.1rem;
+			width: 100%;
+			background: none;
+			background-color: #000;
+			color: white;
+		}
+
+		.message-input:focus {
+			outline: none;
+		}
+
 	}
+
+
 </style>
