@@ -75,15 +75,15 @@ export class ChatController {
   async createChat(
     @GetUser('id') id,
     @Body('membersId') membersId: number[],
-    @Body('name') name?: string,
     @Body('accessibility') accessibility?: string,
+    @Body('name') name?: string,
     @Body('password') password?: string,
   ) {
     membersId.push(id);
     const newGroupChat = await this.chatService.createChat(
       membersId,
-      name,
       accessibility,
+      name,
       password,
     );
 
