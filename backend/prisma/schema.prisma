@@ -125,7 +125,7 @@ model Chat {
 
 	createdAt     DateTime   @default(now())
 	name          String?    @db.VarChar(30)
-	accessibility Access     @default(PUBLIC)
+	accessibility Access     @default(PRIVATE)
 	password      String?
 	messages      Message[]
 	participant	  UserChatRelationship[]

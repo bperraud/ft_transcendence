@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Message } from '../chat/model/chat.model';
+import { Message, MessagePreview } from '../chat/model/chat.model';
 import { Role } from '@prisma/client';
 
 @Injectable()
@@ -8,12 +8,20 @@ export class ChatService {
   constructor(private prisma: PrismaService) {}
 
   async lastConversationMessages(userId: number) {
-    const messages = await this.prisma.$queryRaw<Message[]>`SELECT m.content,
+    const messages = await this.prisma.$queryRaw<
+      MessagePreview[]
+    >`SELECT m.content,
 	m."createdAt",
 	m."senderId",
+	m."chatId",
+	chat.name as "chatName",
+	relation."userId" as "friendId",
+	friend.username as "friendName",
 	u.username as "senderName"
 	FROM "public"."Message" as m
 	JOIN "public"."User" as u ON m."senderId" = u."id"
+	JOIN "public"."UserChatRelationship" as relation ON relation."chatId" = m."chatId"
+	JOIN "public"."User" as friend ON relation."userId" = friend."id"
 	JOIN "public"."Chat" as chat ON m."chatId" = chat."id"
 	WHERE chat.accessibility = 'PRIVATE'::"Access"
 	AND (m."createdAt", m."chatId") IN (
@@ -26,8 +34,8 @@ export class ChatService {
 		)
 		GROUP BY "chatId"
 	)
+	AND relation."userId" != ${userId}
 	`;
-    console.log(messages);
     return messages;
   }
 

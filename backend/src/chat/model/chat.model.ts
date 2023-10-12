@@ -26,6 +26,18 @@ export type Message = {
   content: string;
 };
 
+export type MessagePreview = {
+  id: number;
+  createdAt: Date;
+  chatId: number;
+  chatName: string;
+  friendId: number;
+  friendName: string;
+  senderId: number;
+  senderName: string;
+  content: string;
+};
+
 export type User = {
   id: number;
   username: string;

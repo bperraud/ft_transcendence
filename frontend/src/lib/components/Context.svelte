@@ -38,20 +38,14 @@
 		//	userId: number;
 		//};
 
-
-		//export type NotifRequest = {
-		//	id: number;
-		//	username: string;
-		//};
-
-		export type Conversation = {
-			//id: number;
-			friendId: number;
-			messages: Message[];
-			//createdAt: string;
-			//updatedAt: string;
-			//userId: number;
-		}
+		//export type Conversation = {
+		//	//id: number;
+		//	friendId: number;
+		//	messages: Message[];
+		//	//createdAt: string;
+		//	//updatedAt: string;
+		//	//userId: number;
+		//}
 
 		export type Chat = {
 			chatUsers: ChatUser[];
@@ -76,8 +70,10 @@
 
 		export type Message = {
 			content : string;
+			chatId : number;
 			senderId : number;
 			senderName : string;
+			friendName: string;
 			createdAt : Date;
 		}
 
@@ -645,39 +641,6 @@
 		return data;
 	}
 
-	async function fetchCreateChat(
-		groupName: any,
-		memberUsernames: any,
-		isGroupChat: any,
-		accessibility: string,
-		password?: string
-	) {
-		//const response = await fetchWithToken('chat/create-chat', {
-		//	method: 'POST',
-		//	headers: {
-		//		'Content-Type': 'application/json'
-		//	},
-		//	body: JSON.stringify({
-		//		groupName,
-		//		memberUsernames,
-		//		isGroupChat,
-		//		accessibility,
-		//		password
-		//	})
-		//});
-
-		//if (!response.ok) throw new Error(`Error: ${response.statusText}`);
-		//const newGroupChat = await response.json();
-		//return newGroupChat;
-	}
-
-	async function fetchChatById(chatId: number) {
-		//const res = await fetchWithToken(`chat/conversation/${chatId}`);
-		//if (!res.ok) throw new Error(res.statusText);
-		//const data = await res.json();
-		//return data;
-	}
-
 	async function fetchConversationById(chatId: number | null) {
 		const res = await fetchWithToken(`chat/conversation/${chatId}`);
 		if (!res.ok) throw new Error(res.statusText);
@@ -748,10 +711,8 @@
 	setContext('fetchFriends', fetchFriends);
 	setContext('fetchGetUserBlocks', fetchGetUserBlocks);
 	setContext('fetchFriendRequest', fetchFriendRequest);
-	setContext('fetchChatById', fetchChatById);
 	setContext('fetchConversationById', fetchConversationById);
 	setContext('fetchChats', fetchChats);
-	setContext('fetchCreateChat', fetchCreateChat);
 	setContext('fetchVerifyPassword', fetchVerifyPassword);
 	setContext('fetchStatistics', fetchStatistics);
 	setContext('fetchUnreadConversations', fetchUnreadConversations);

@@ -7,6 +7,7 @@
 
 	const chats = Context.chats();
 	const lastMessages = Context.lastMessages();
+	const addInstance = Context.addInstance();
 	const blocks = Context.blocks();
 	const fetchChats = Context.fetchChats();
 	const getUnreadMessagesCount = Context.getUnreadMessagesCount();
@@ -47,9 +48,8 @@
 <div id="box">
 	<div id="chat-window">
 		{#each $lastMessages as conversation, i (i)}
-			<!--addInstance('conversation', {}, { friendId: friend.id })-->
-				<div class="chat" on:click={() => conversation }>
-					<div class="chat-header">
+			<div class="chat" on:click={() => addInstance('Chat', {}, { chatId: conversation.chatId })}>
+				<div class="chat-header">
 						<!--{#if conversation.isGroupChat}
 							<h4>
 								{conversation.name}
@@ -62,43 +62,43 @@
 								</h5>
 							</h4>
 						{:else}-->
-						<h4>
-							{conversation.senderName}
-						</h4>
+					<h4>
+						{conversation.friendName}
+					</h4>
 						<!--{/if}-->
-					</div>
-					<div class="chat-content">
-						{#if $lastMessages.length > 0}
-							<div class="message-details">
-								<p>
-									<!--{#if !$blockedIds.includes(getFriendId(chat))}
-									{chat.messages[chat.messages.length - 1].userId === $user?.id
-										? 'you'
-										: getLastMessageSender(chat)}
-									: { chat.messages[chat.messages.length - 1].content }
-								{:else}
-									{ 'blocked' }
-								{/if}-->
-									{conversation.senderId === $user?.id ? 'you' : conversation.senderName} :  { conversation.content}
-								</p>
-								<span class="timestamp"
-									>{timeDifference(
-										now,
-										new Date(conversation.createdAt)
-									)}</span
-								>
-							</div>
-							<p class="notification-badge">
+				</div>
+				<div class="chat-content">
+					{#if $lastMessages.length > 0}
+						<div class="message-details">
+							<p>
+								<!--{#if !$blockedIds.includes(getFriendId(chat))}
+								{chat.messages[chat.messages.length - 1].userId === $user?.id
+									? 'you'
+									: getLastMessageSender(chat)}
+								: { chat.messages[chat.messages.length - 1].content }
+							{:else}
+								{ 'blocked' }
+							{/if}-->
+								{conversation.senderId === $user?.id ? 'you' : conversation.senderName} : { conversation.content}
+							</p>
+							<span class="timestamp"
+								>{timeDifference(
+									now,
+									new Date(conversation.createdAt)
+								)}</span
+							>
+						</div>
+						<p class="notification-badge">
 								<!--<NotificationBadge count={getUnreadMessagesCount(
 									chat,
 									chat.chatUsers.find((chatUser) => chatUser.userId === $user?.id)
 								)} />-->
-							</p>
-						{:else}
-							<p>No messages yet</p>
-						{/if}
-					</div>
+						</p>
+					{:else}
+						<p>No messages yet</p>
+					{/if}
 				</div>
+			</div>
 		{/each}
 	</div>
 </div>
