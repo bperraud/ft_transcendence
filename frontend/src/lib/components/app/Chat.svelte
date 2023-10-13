@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, afterUpdate } from 'svelte';
+	import { onMount, afterUpdate, beforeUpdate } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
 	import { user } from '$lib/stores';
 	import { writable } from 'svelte/store';
@@ -15,7 +15,7 @@
 	let currentChat = writable<Context.Message[]>([]);
 	let messageContent = '';
 	let chatWindow: HTMLDivElement;
-	let autoScroll = true;
+	let autoScroll = false;
 	let blockedIds: number[];
 	let noMember = false;
 
@@ -43,6 +43,11 @@
 		updateLastMessageRead();
 	});
 
+	beforeUpdate(() => {
+		if (chatWindow)
+			autoScroll = chatWindow.scrollTop + chatWindow.clientHeight + 1 >= chatWindow.scrollHeight;
+	 });
+
 	afterUpdate(() => {
 		if (autoScroll) chatWindow.scrollTop = chatWindow.scrollHeight;
 	});
@@ -50,10 +55,6 @@
 	function openProfile(userId: number) {
 		addInstance('Profile', { userId: userId }, { userId: userId });
 		$selected = null;
-	}
-
-	function handleScroll() {
-		autoScroll = chatWindow.scrollTop + chatWindow.clientHeight + 1 >= chatWindow.scrollHeight;
 	}
 
 	async function handleClick(event: any) {
@@ -95,7 +96,7 @@
 </script>
 
 <div id="box" on:click={handleClick}>
-	<div id="chat-window" bind:this={chatWindow} on:scroll={handleScroll}>
+	<div id="chat-window" bind:this={chatWindow}>
 		{#if !$currentChat.length}
 			<h5>Waiting for messages...</h5>
 		{:else}

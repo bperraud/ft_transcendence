@@ -1,9 +1,13 @@
 <script lang="ts">
+	import { afterUpdate, beforeUpdate } from 'svelte';
+
 	import DropDown from '$lib/components/drop/DropDown.svelte';
 
+	let textAreaElem : HTMLDivElement;
 	let input = '';
-
-	let textareaValue = '';
+	let textAreaValue = '';
+	let autoScroll = false;
+	let activeDrop: string | null = null;
 
 	function clear() {
 		input = '';
@@ -34,11 +38,18 @@
 			method: 'GET'
 		});
 		const data = await res.text();
-		textareaValue += data;
+		textAreaValue += data;
 		console.log(data);
 	}
 
-	let activeDrop: string | null = null;
+	beforeUpdate(() => {
+		if (textAreaElem)
+			autoScroll = textAreaElem.scrollTop + textAreaElem.clientHeight + 1 >= textAreaElem.scrollHeight;
+	 });
+
+	afterUpdate(() => {
+		if (autoScroll) textAreaElem.scrollTop = textAreaElem.scrollHeight;
+	});
 
 	fetchWithTokenWebServer("minishell", {
 			method: 'GET'
@@ -59,7 +70,8 @@
 		</DropDown>
 	</div>
 	<div class="content">
-		<p>{textareaValue}</p>
+		<p bind:this={textAreaElem}>{textAreaValue}</p>
+
 		<!--<p bind:value={textareaValue} readonly/>-->
 		<input type="text" bind:value={input} class="message-input" on:keydown={handleKeyDown}/>
 	</div>
