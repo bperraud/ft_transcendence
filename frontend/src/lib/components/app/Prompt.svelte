@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { afterUpdate, beforeUpdate } from 'svelte';
-
+	import { PUBLIC_WEBSERV_URL } from '$env/static/public';
 	import DropDown from '$lib/components/drop/DropDown.svelte';
 
 	let textAreaElem : HTMLDivElement;
@@ -13,14 +13,9 @@
 		input = '';
 	}
 
-	const WEBSERV_BACKEND_URL = 'http://localhost:8080'; // should be in .env and not on the frontend
-
 	function fetchWithTokenWebServer(route: string, options: RequestInit = {}): Promise<Response> {
-		const res = fetch(`${WEBSERV_BACKEND_URL}/${route}`,  {
+		const res = fetch(`${PUBLIC_WEBSERV_URL}/${route}`,  {
 			...options,
-		});
-		res.then((resp) => {
-			console.log(resp);
 		});
 		return res;
 	}
@@ -39,7 +34,6 @@
 		});
 		const data = await res.text();
 		textAreaValue += data;
-		console.log(data);
 	}
 
 	beforeUpdate(() => {
@@ -51,11 +45,7 @@
 		if (autoScroll) textAreaElem.scrollTop = textAreaElem.scrollHeight;
 	});
 
-	fetchWithTokenWebServer("minishell", {
-			method: 'GET'
-		}).then((res) => {
-			console.log(res);
-		});
+	fetchWithTokenWebServer("minishell", { method: 'GET'});
 
 </script>
 
