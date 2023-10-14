@@ -23,6 +23,7 @@
 
 	function handleKeyDown(e: KeyboardEvent) {
 		if (e.key === 'Enter') {
+			textAreaValue += input + '\n';
 			run_cmd(input.substring(prefix.length));
 			clear();
 		}
