@@ -4,13 +4,14 @@
 	import DropDown from '$lib/components/drop/DropDown.svelte';
 
 	let textAreaElem : HTMLDivElement;
-	let input = '';
+	let prefix = "$ ";
+	let input = prefix;
 	let textAreaValue = '';
 	let autoScroll = false;
 	let activeDrop: string | null = null;
 
 	function clear() {
-		input = '';
+		input = prefix;
 	}
 
 	function fetchWithTokenWebServer(route: string, options: RequestInit = {}): Promise<Response> {
@@ -22,8 +23,13 @@
 
 	function handleKeyDown(e: KeyboardEvent) {
 		if (e.key === 'Enter') {
-			run_cmd(input);
+			run_cmd(input.substring(prefix.length));
 			clear();
+		}
+		else if (e.key === 'Backspace') {
+			if (input.length <= prefix.length) {
+				e.preventDefault();
+			}
 		}
 	}
 
@@ -61,8 +67,6 @@
 	</div>
 	<div class="content">
 		<p bind:this={textAreaElem}>{textAreaValue}</p>
-
-		<!--<p bind:value={textareaValue} readonly/>-->
 		<input type="text" bind:value={input} class="message-input" on:keydown={handleKeyDown}/>
 	</div>
 </div>
@@ -114,8 +118,5 @@
 		.message-input:focus {
 			outline: none;
 		}
-
 	}
-
-
 </style>
