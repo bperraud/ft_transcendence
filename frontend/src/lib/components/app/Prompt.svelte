@@ -7,8 +7,6 @@
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 
-
-
 	let textAreaElem : HTMLDivElement;
 	let prefix = "\\" + $user.username + " $ ";
 	let input = prefix;

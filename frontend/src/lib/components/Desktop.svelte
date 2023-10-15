@@ -30,6 +30,8 @@
 	const unreadConversations = Context.unreadConversations();
 	const friendRequest = Context.friendRequest();
 	const gameRequest = Context.gameRequest();
+	const updateMatchHistory = Context.updateMatchHistory();
+
 
 	let clickedImg: string = '';
 	let clickedName: string = '';
@@ -51,6 +53,8 @@
 		await fetchGetUserBlocks();
 		await fetchFriendRequest();
 		await fetchChats();
+
+		$updateMatchHistory = 0;
 	})();
 
 	const notVisible = new Set(['FriendRequest', 'Chat', 'ChatForum', 'EditProfile', 'PongKeybinds']);

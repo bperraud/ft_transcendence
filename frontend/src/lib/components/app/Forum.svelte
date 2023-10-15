@@ -8,7 +8,6 @@
 	const chats = Context.chats();
 	const chatsPublic = Context.chatsPublic();
 	const fetchPublicChats = Context.fetchPublicChats();
-	const fetchCreateChat = Context.fetchCreateChat();
 	const fetchChatById = Context.fetchChatById();
 	const addInstance = Context.addInstance();
 
@@ -34,9 +33,9 @@
 		if (groupName.trim() === '' || ['public', 'protected'].indexOf(accessibility) < 0) {
 			return;
 		}
-		const chat = await fetchCreateChat(groupName, [$user?.username], true, accessibility, password);
-		$chats = [...$chats, chat];
-		$chatId = chat.id;
+		//const chat = await fetchCreateChat(groupName, [$user?.username], true, accessibility, password);
+		//$chats = [...$chats, chat];
+		//$chatId = chat.id;
 		addInstance('ChatForum');
 	};
 

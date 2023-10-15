@@ -9,7 +9,7 @@
 	const selected = Context.selected();
 	const addInstance = Context.addInstance();
 	const fetchUpdateLastMessageRead = Context.fetchUpdateLastMessageRead();
-	const fetchConversationById = Context.fetchConversationById();
+	const fetchWithToken = Context.fetchWithToken();
 
 	let chatIdLocal: number ;
 	let currentChat = writable<Context.Message[]>([]);
@@ -88,6 +88,13 @@
 		hour: 'numeric',
 		minute: '2-digit'
 	});
+
+	async function fetchConversationById(chatId: number | null) {
+		const res = await fetchWithToken(`chat/conversation/${chatId}`);
+		if (!res.ok) throw new Error(res.statusText);
+		const data = await res.json();
+		return data;
+	}
 
 	(async () => {
 		$currentChat = await fetchConversationById(chatId);

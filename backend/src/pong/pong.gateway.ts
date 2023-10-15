@@ -61,13 +61,6 @@ export class PongGateway extends SocketGateway {
 
   gameOver(winner: number, room: string) {
     const game = this.games.get(room);
-    this.gameEnd(game);
-    this.games.delete(room);
-    this.server.to(room).emit('game-over', { winnerId: winner });
-    game.getPlayer1().leave(room);
-    game.getPlayer2().leave(room);
-    this.pongService.removeClientRoom(game.getPlayer1().id);
-    this.pongService.removeClientRoom(game.getPlayer2().id);
     this.statService.updateStat(
       this.webSocketService.getClientId(game.getPlayer1()),
       {
@@ -77,6 +70,13 @@ export class PongGateway extends SocketGateway {
         score2: game.getScorePlayer2(),
       },
     );
+    this.server.to(room).emit('game-over', { winnerId: winner });
+    this.gameEnd(game);
+    this.games.delete(room);
+    game.getPlayer1().leave(room);
+    game.getPlayer2().leave(room);
+    this.pongService.removeClientRoom(game.getPlayer1().id);
+    this.pongService.removeClientRoom(game.getPlayer2().id);
   }
 
   @SubscribeMessage('response-game')

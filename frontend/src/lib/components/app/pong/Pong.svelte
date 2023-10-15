@@ -15,7 +15,6 @@
 	const matchmaking = Context.matchmaking();
 	const room = Context.room();
 	const settings = Context.settings();
-	const outcome = Context.outcome();
 
 	fetchSettings();
 

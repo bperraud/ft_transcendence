@@ -6,39 +6,37 @@
 	export let userId: number | null = null;
 
 	const fetchWithToken = Context.fetchWithToken();
-	const fetchHistory = Context.fetchHistory();
-	const history = Context.history();
-	const outcome = Context.outcome();
-
 	let current: Context.Match | null = null;
 	let currentHistory = writable<Context.Match[]>();
 
-	$: if (userId === null) $currentHistory = $history;
-
-	async function updateHistory() {
-		if (userId === null) {
-			await fetchHistory();
-		} else {
-			const res = await fetchWithToken(`stat/get-history/${userId}`);
-			let data = await res.json();
-			data.forEach(function (element: any, index: number) {
-				const createdAtDate = new Date(element.createdAt);
-				data[index] = {
-					result: $user?.username === element.winnerName ? 'Win' : 'Lose',
-					opponent: $user?.username === element.winnerName ? element.loserName : element.winnerName,
-					createdAt: createdAtDate.toLocaleDateString('en', {
-						day: '2-digit',
-						month: '2-digit',
-						year: 'numeric'
-					})
-				};
-			});
-			$currentHistory = data;
-		}
+	async function fetchHistory(id : number | null) {
+		const res = await fetchWithToken(`stat/get-history/${id}`);
+		const data = await res.json();
+		data.forEach(function (element: any, index: number) {
+			const createdAtDate = new Date(element.createdAt);
+			data[index] = {
+				result: id === element.winnerId ? 'Win' : 'Lose',
+				opponent: element.username,
+				createdAt: createdAtDate.toLocaleDateString('en', {
+					day: '2-digit',
+					month: '2-digit',
+					year: 'numeric'
+				})
+			};
+		});
+		return data;
 	}
 
-	updateHistory();
-	$: if ($outcome) updateHistory();
+	async function updateHistory() {
+		$currentHistory = await fetchHistory(userId);
+	}
+
+	$:  {
+		if (userId === null) {
+			userId = $user.id;
+		}
+		updateHistory();
+	}
 </script>
 
 <div class="sunken-panel">
