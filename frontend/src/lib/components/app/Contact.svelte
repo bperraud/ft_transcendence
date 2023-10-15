@@ -10,7 +10,6 @@
 	const fetchMe = Context.fetchMe();
 	const contacts = Context.contacts();
 	const friendRequest = Context.friendRequest();
-	const openPongWindow = Context.openPongWindow();
 	const addInstance = Context.addInstance();
 	const selected = Context.selected();
 	const askGame = Context.askGame();
@@ -77,7 +76,7 @@
 
 	function spectateGame(friendId: number) {
 		$socket.emit('spectate', { friendId: friendId });
-		$openPongWindow = true;
+		addInstance('Pong');
 	}
 </script>
 
@@ -137,7 +136,7 @@
 									on:click={() => askGame(friend.id)}
 								/>
 							{/if}
-							<img class="option-icons" src="/write.png" on:click={() => startChat([friend.id])} />
+							<img class="option-icons" src="/write.png" on:dblclick={() => startChat([friend.id])} />
 							{#if friend.status === 'in-game'}
 								<img
 									class="option-icons"

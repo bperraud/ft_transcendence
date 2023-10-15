@@ -10,7 +10,7 @@
 	const fetchPublicChats = Context.fetchPublicChats();
 	const fetchCreateChat = Context.fetchCreateChat();
 	const fetchChatById = Context.fetchChatById();
-	const openChatForumWindow = Context.openChatForumWindow();
+	const addInstance = Context.addInstance();
 
 	let currentView = 'public';
 	let start = 0;
@@ -37,7 +37,7 @@
 		const chat = await fetchCreateChat(groupName, [$user?.username], true, accessibility, password);
 		$chats = [...$chats, chat];
 		$chatId = chat.id;
-		$openChatForumWindow = true;
+		addInstance('ChatForum');
 	};
 
 	async function startChat(chat: Context.Chat) {
@@ -56,7 +56,7 @@
 				);
 			$chats.push(updatedChat);
 			$chatId = chat.id;
-			$openChatForumWindow = true;
+			addInstance('ChatForum');
 		}
 	}
 

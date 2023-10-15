@@ -7,7 +7,7 @@
 	const fetchVerifyPassword = Context.fetchVerifyPassword();
 	const chatId = Context.chatId();
 	const chats = Context.chats();
-	const openChatForumWindow = Context.openChatForumWindow();
+	const addInstance = Context.addInstance();
 
 	export let selectedChat: any;
 	export let chatPassword: string;
@@ -32,7 +32,7 @@
 			else
 				$chats.push(selectedChat);
 			$socket.emit('joinRoom', { chatId: selectedChat.id });
-			$openChatForumWindow = true;
+			addInstance('ChatForum');
 			dialog.close();
 		} else {
 			errorMessage = 'Invalid Password';

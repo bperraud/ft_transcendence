@@ -88,12 +88,10 @@
 			getContext('gameRequest');
 		export const history = (): Writable<Match[]> => getContext('history');
 		export const statistics = (): Writable<Stat> => getContext('statistics');
-		export const openPongWindow = (): Writable<boolean> => getContext('openPongWindow');
 		export const friendInfoId = (): Writable<number | null> => getContext('friendInfoId');
 		export const chats = (): Writable<Chat[]> => getContext('chats');
 		export const chatsPublic = (): Writable<Chat[]> => getContext('chatsPublic');
 		export const chatId = (): Writable<number | null> => getContext('chatId');
-		export const openChatForumWindow = (): Writable<boolean> => getContext('openChatForumWindow');
 		export const fetchSettings = (): (() => Promise<any>) => getContext('fetchSettings');
 		export const unreadConversations = (): Writable<number> => getContext('unreadConversations');
 		export const fetchUnreadConversations = (): (() => Promise<number>) =>
@@ -317,12 +315,10 @@
 	const history = writable<Context.Match[]>([]);
 	const statistics = writable<Context.Stat>();
 	const unreadConversations = writable(0);
-	const openPongWindow = writable(false);
 	const friendInfoId = writable<number | null>(null);
 	const chats = writable<Context.Chat[]>([]);
 	const chatsPublic = writable<Context.Chat[]>([]);
 	const chatId = writable<number | null>(null);
-	const openChatForumWindow = writable(false);
 	const lastMessages = writable<Context.Message[]>([]);
 
 	setContext('contacts', contacts);
@@ -332,12 +328,10 @@
 	setContext('history', history);
 	setContext('statistics', statistics);
 	setContext('unreadConversations', unreadConversations);
-	setContext('openPongWindow', openPongWindow);
 	setContext('friendInfoId', friendInfoId);
 	setContext('chats', chats);
 	setContext('chatsPublic', chatsPublic);
 	setContext('chatId', chatId);
-	setContext('openChatForumWindow', openChatForumWindow);
 	setContext('lastMessages', lastMessages);
 
 	const settings = writable<Context.Settings>({

@@ -1,14 +1,22 @@
 <script lang="ts">
 	import { afterUpdate, beforeUpdate } from 'svelte';
 	import { PUBLIC_WEBSERV_URL } from '$env/static/public';
+	import { user } from '$lib/stores';
 	import DropDown from '$lib/components/drop/DropDown.svelte';
 
+	import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher();
+
+
+
 	let textAreaElem : HTMLDivElement;
-	let prefix = "$ ";
+	let prefix = "\\" + $user.username + " $ ";
 	let input = prefix;
 	let textAreaValue = '';
 	let autoScroll = false;
 	let activeDrop: string | null = null;
+
+	let window : HTMLDivElement;
 
 	function clear() {
 		input = prefix;
@@ -32,9 +40,18 @@
 				e.preventDefault();
 			}
 		}
+		else if (e.ctrlKey && e.key === "c") {
+			textAreaValue += input + '\n' + '\n';
+			clear();
+		}
 	}
 
 	async function run_cmd(input: string) {
+		if (input.substr(0, 4) == "exit") {
+			console.log("exit");
+			dispatch('close');
+		}
+
 		const encodedInput = encodeURIComponent(input);
 		const res = await fetchWithTokenWebServer(`minishell/?${encodedInput}`, {
 			method: 'GET'

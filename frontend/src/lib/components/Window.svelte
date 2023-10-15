@@ -2,13 +2,10 @@
 	import { onMount } from 'svelte';
 	import { createEventDispatcher } from 'svelte';
 	import { Context } from '$lib/components/Context.svelte';
-	import { user } from '$lib/stores';
 	import LeaveGroupDialog from '$lib/components/dialog/LeaveGroupDialog.svelte';
 
 	const dispatch = createEventDispatcher();
 	const chatId = Context.chatId();
-	const chats = Context.chats();
-	const contacts = Context.contacts();
 	const socket = Context.socket();
 	const selected = Context.selected();
 	const fetchUserById = Context.fetchUserById();
@@ -26,12 +23,10 @@
 	let width: number;
 	let height: number;
 	let editable = false;
-
 	let currentChat: any;
 	let chatIdLocal: number | null = $chatId;
 	let typeChat: string | null = null;
 	let friendUsername: string | null | undefined = '';
-
 	let isDialogOpen = false;
 
 	$: {
@@ -39,21 +34,6 @@
 		if (left + width > parentWidth) left = parentWidth - width;
 		if (top < 0) top = 0;
 		if (left < 0) left = 0;
-
-		if (name === 'Chat' || name === 'ChatForum') {
-			currentChat = $chats.find((chat) => chat.id === chatIdLocal);
-			if (currentChat?.isGroupChat) typeChat = 'Group';
-			else {
-				typeChat = 'Chat';
-				if (props.friendId)
-					friendUsername = $contacts.find((c) => c.id === props.friendId)?.username;
-				if (currentChat && friendUsername === undefined) {
-					currentChat.chatUsers.forEach((c: any) => {
-						if (c.userId !== $user?.id) friendUsername = c.user.username;
-					});
-				}
-			}
-		}
 	}
 
 	let username: string | null = null;

@@ -6,31 +6,14 @@
 	import Clock from './Clock.svelte';
 	import NotificationBadge from './NotificationBadge.svelte';
 
-	const chats = Context.chats();
-	const openChatForumWindow = Context.openChatForumWindow();
-	const openPongWindow = Context.openPongWindow();
 	const appInstances = Context.appInstances();
 	const zstack = Context.zstack();
 	const selected = Context.selected();
 	const addInstance = Context.addInstance();
 	const removeInstance = Context.removeInstance();
-	const socket = Context.socket();
 
 	function putOnTop(id: string) {
 		$zstack = [...$zstack.filter((z) => z !== id), id];
-	}
-
-	$: {
-		if ($openChatForumWindow) {
-			addInstance('ChatForum');
-			$selected = null;
-			openChatForumWindow.set(false);
-		}
-		if ($openPongWindow) {
-			addInstance('Pong');
-			$selected = null;
-			openPongWindow.set(false);
-		}
 	}
 
 	const apps = Context.apps();
@@ -67,14 +50,7 @@
 		await fetchFriends();
 		await fetchGetUserBlocks();
 		await fetchFriendRequest();
-
 		await fetchChats();
-
-		//fetchChats().then(() => {
-		//	$chats.forEach((chat) => {
-		//		if (chat.isGroupChat) $socket.emit('joinRoom', { chatId: chat.id });
-		//	});
-		//});
 	})();
 
 	const notVisible = new Set(['FriendRequest', 'Chat', 'ChatForum', 'EditProfile', 'PongKeybinds']);
