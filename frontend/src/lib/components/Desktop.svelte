@@ -119,7 +119,7 @@
 				$selected = id;
 			}}
 		>
-			<svelte:component this={component} {...props} />
+			<svelte:component on:close={() => removeInstance(id)} this={component} {...props} />
 		</Window>
 	{/each}
 </div>

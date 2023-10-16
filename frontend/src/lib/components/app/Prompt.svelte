@@ -45,7 +45,7 @@
 	}
 
 	async function run_cmd(input: string) {
-		if (input.substr(0, 4) == "exit") {
+		if (input.slice(0, 4) == "exit" && (input.length == 4 || input[4] == ' ')) {
 			console.log("exit");
 			dispatch('close');
 		}

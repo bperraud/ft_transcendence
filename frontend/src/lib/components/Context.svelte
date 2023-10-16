@@ -231,7 +231,6 @@
 
 		export const matchmaking = (): Writable<boolean> => getContext('matchmaking');
 		export const nPongs = (): Writable<number> => getContext('nPongs');
-		export const updateHistory = (): Writable<number> => getContext('updateHistory');
 		export const room = (): Writable<Room | null> => getContext('room');
 		export const outcome = (): Writable<'win' | 'lose' | null> => getContext('outcome');
 		export const updateStat = (): Writable<number> => getContext('updateStat');
@@ -674,7 +673,6 @@
 	setContext('nPongs', nPongs);
 	setContext('matchmaking', matchmaking);
 	setContext('outcome', outcome);
-	setContext('updateHistory', updateHistory);
 
 	$: if ($matchmaking) {
 		fetchWithToken('matchmaking/queue', {
