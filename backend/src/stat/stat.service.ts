@@ -98,7 +98,8 @@ export class StatService {
     try {
       const history = await this.prisma.$queryRaw<
         any[]
-      >`SELECT m."winnerId", u.username, m."createdAt"
+      >`SELECT (CASE WHEN m."winnerId" = ${playerId} THEN 'Win' ELSE 'Lose' END) as result,
+	  	 u.username, m."createdAt"
 		 FROM "public"."User" AS u
 		 JOIN "public"."Match" As m ON "loserId" = u.id OR "winnerId" = u.id
 		 WHERE u.id != ${playerId}

@@ -14,19 +14,18 @@
 	async function fetchHistory() {
 		const res = await fetchWithToken(`stat/get-history/${userId}`);
 		const data = await res.json();
-		data.forEach(function (element: any, index: number) {
+		const updatedData = data.map((element : any) => {
 			const createdAtDate = new Date(element.createdAt);
-			data[index] = {
-				result: userId === element.winnerId ? 'Win' : 'Lose',
-				opponent: element.username,
+			return {
+				...element,
 				createdAt: createdAtDate.toLocaleDateString('en', {
-					day: '2-digit',
-					month: '2-digit',
-					year: 'numeric'
+				day: '2-digit',
+				month: '2-digit',
+				year: 'numeric'
 				})
 			};
 		});
-		return data;
+		return updatedData;
 	}
 
 	contextUpdateHistory.subscribe(() => {
