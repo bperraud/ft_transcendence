@@ -231,9 +231,10 @@
 
 		export const matchmaking = (): Writable<boolean> => getContext('matchmaking');
 		export const nPongs = (): Writable<number> => getContext('nPongs');
+		export const updateHistory = (): Writable<number> => getContext('updateHistory');
 		export const room = (): Writable<Room | null> => getContext('room');
 		export const outcome = (): Writable<'win' | 'lose' | null> => getContext('outcome');
-		export const updateMatchHistory = (): Writable<number> => getContext('updateMatchHistory');
+		export const updateStat = (): Writable<number> => getContext('updateStat');
 
 	}
 </script>
@@ -305,6 +306,10 @@
 	const chatsPublic = writable<Context.Chat[]>([]);
 	const chatId = writable<number | null>(null);
 	const lastMessages = writable<Context.Message[]>([]);
+	const updateHistory = writable(0);
+
+	const updateStat = writable(0);
+	setContext('updateStat', updateStat);
 
 	setContext('contacts', contacts);
 	setContext('blocks', blocks);
@@ -574,15 +579,7 @@
 		return data;
 	}
 
-	async function fetchStatistics() {
-		const res = await fetchWithToken(`stat/get-stat/${$user?.id}`);
-		const data = await res.json();
-		$statistics = data;
-		return data;
-	}
-
 	async function fetchChats() {
-		console.log('fetchChats');
 		const res = await fetchWithToken('chat/lastConversationMessages');
 		const data = await res.json();
 		$lastMessages = data;
@@ -645,7 +642,6 @@
 	}
 
 	setContext('fetchPublicChats', fetchPublicChats);
-	setContext('fetchHistory', fetchHistory);
 	setContext('fetchMe', fetchMe);
 	setContext('fetchUserByUsername', fetchUserByUsername);
 	setContext('fetchUserById', fetchUserById);
@@ -655,7 +651,6 @@
 	setContext('fetchFriendRequest', fetchFriendRequest);
 	setContext('fetchChats', fetchChats);
 	setContext('fetchVerifyPassword', fetchVerifyPassword);
-	setContext('fetchStatistics', fetchStatistics);
 	setContext('fetchUnreadConversations', fetchUnreadConversations);
 
 	const socket = readable<Socket>(
@@ -676,13 +671,12 @@
 	const nPongs = writable(0);
 	const room = writable<Context.Room | null>(null);
 	const outcome = writable<'win' | 'lose' | null>(null);
-	const updateMatchHistory = writable<number>();
 
 	setContext('room', room);
 	setContext('nPongs', nPongs);
 	setContext('matchmaking', matchmaking);
 	setContext('outcome', outcome);
-	setContext('updateMatchHistory', updateMatchHistory);
+	setContext('updateHistory', updateHistory);
 
 	$: if ($matchmaking) {
 		fetchWithToken('matchmaking/queue', {
@@ -756,10 +750,11 @@
 	});
 
 	$socket.on('game-over', (data: { winnerId: number }) => {
-		fetchStatistics();
 		$matchmaking = false;
 		$outcome = data.winnerId === $room!.players.indexOf($user!.id) ? 'win' : 'lose';
-		$updateMatchHistory += 1;
+		$updateHistory++;
+		//$updateStat++;
+		updateStat.set($updateStat + 1);
 		$room = null;
 		console.log("game-over");
 	});

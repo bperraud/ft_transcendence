@@ -8,14 +8,15 @@
 	const fetchWithToken = Context.fetchWithToken();
 	let current: Context.Match | null = null;
 	let currentHistory = writable<Context.Match[]>();
+	const contextUpdateHistory = Context.updateStat();
 
-	async function fetchHistory(id : number | null) {
-		const res = await fetchWithToken(`stat/get-history/${id}`);
+	async function fetchHistory() {
+		const res = await fetchWithToken(`stat/get-history/${userId}`);
 		const data = await res.json();
 		data.forEach(function (element: any, index: number) {
 			const createdAtDate = new Date(element.createdAt);
 			data[index] = {
-				result: id === element.winnerId ? 'Win' : 'Lose',
+				result: userId === element.winnerId ? 'Win' : 'Lose',
 				opponent: element.username,
 				createdAt: createdAtDate.toLocaleDateString('en', {
 					day: '2-digit',
@@ -27,16 +28,27 @@
 		return data;
 	}
 
-	async function updateHistory() {
-		$currentHistory = await fetchHistory(userId);
-	}
+	const updateH = contextUpdateHistory.subscribe(() => {
+		fetchHistory().then(data => {
+			$currentHistory = data;
+		});
+		console.log("updateHistory");
+		console.log(userId);
+	});
 
-	$:  {
+	//async function updateHistory() {
+	//	$currentHistory = await fetchHistory(userId);
+	//}
+
+	$: {
 		if (userId === null) {
 			userId = $user.id;
 		}
-		updateHistory();
+		fetchHistory().then(data => {
+			$currentHistory = data;
+		});
 	}
+
 </script>
 
 <div class="sunken-panel">

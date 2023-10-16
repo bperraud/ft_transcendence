@@ -1,29 +1,40 @@
 <script lang="ts">
 	import { Context } from '$lib/components/Context.svelte';
 	import { writable } from 'svelte/store';
+	import { user } from '$lib/stores';
 
 	export let userId: number | null | undefined = null;
 
-	const fetchStatistics = Context.fetchStatistics();
 	const fetchWithToken = Context.fetchWithToken();
-	const statistics = Context.statistics();
-	const outcome = Context.outcome();
-
 	let currentStatistics = writable<Context.Stat>();
+	const contextUpdateStat = Context.updateStat();
 
-	$: if (userId === null) $currentStatistics = $statistics;
-
-	async function updateStatistics() {
-		if (userId === null) {
-			await fetchStatistics();
-		} else {
-			const res = await fetchWithToken(`stat/get-stat/${userId}`);
-			$currentStatistics = await res.json();
-		}
+	async function fetchStatistics() {
+		const res = await fetchWithToken(`stat/get-stat/${userId}`);
+		const data = await res.json();
+		return data;
 	}
 
-	updateStatistics();
-	$: if ($outcome) updateStatistics();
+	const updateS = contextUpdateStat.subscribe(() => {
+		fetchStatistics().then(data => {
+			$currentStatistics = data; // Update the store with the fetched data
+		});
+		console.log("updatestat");
+		console.log(userId);
+	});
+
+	$:  {
+		//$updateStat = 0;
+		if (userId === null) {
+			userId = $user.id;
+		}
+		fetchStatistics().then(data => {
+			$currentStatistics = data;
+		});
+		//console.log($updateStat);
+		//console.log($updateStat);
+	}
+
 </script>
 
 <div class="statistic-pic">

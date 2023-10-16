@@ -15,12 +15,10 @@
 	const ping = Context.ping();
 	const serverClockDelta = Context.serverClockDelta();
 	const fetchUserById = Context.fetchUserById();
-	const fetchStatistics = Context.fetchStatistics();
 	const nPongs = Context.nPongs();
 
 	$nPongs++;
 
-	fetchStatistics();
 	fetchSettings();
 
 	interface Player {
