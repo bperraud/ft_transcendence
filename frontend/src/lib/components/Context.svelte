@@ -306,11 +306,9 @@
 	const chatsPublic = writable<Context.Chat[]>([]);
 	const chatId = writable<number | null>(null);
 	const lastMessages = writable<Context.Message[]>([]);
-	const updateHistory = writable(0);
-
 	const updateStat = writable(0);
-	setContext('updateStat', updateStat);
 
+	setContext('updateStat', updateStat);
 	setContext('contacts', contacts);
 	setContext('blocks', blocks);
 	setContext('friendRequest', friendRequest);
@@ -752,11 +750,8 @@
 	$socket.on('game-over', (data: { winnerId: number }) => {
 		$matchmaking = false;
 		$outcome = data.winnerId === $room!.players.indexOf($user!.id) ? 'win' : 'lose';
-		$updateHistory++;
-		//$updateStat++;
 		updateStat.set($updateStat + 1);
 		$room = null;
-		console.log("game-over");
 	});
 
 	$socket.on('addChat', (chat) => {

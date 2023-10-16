@@ -2,6 +2,7 @@
 	import { Context } from '$lib/components/Context.svelte';
 	import { writable } from 'svelte/store';
 	import { user } from '$lib/stores';
+	import { onMount } from 'svelte';
 
 	export let userId: number | null = null;
 
@@ -28,26 +29,18 @@
 		return data;
 	}
 
-	const updateH = contextUpdateHistory.subscribe(() => {
+	contextUpdateHistory.subscribe(() => {
 		fetchHistory().then(data => {
 			$currentHistory = data;
 		});
-		console.log("updateHistory");
-		console.log(userId);
 	});
 
-	//async function updateHistory() {
-	//	$currentHistory = await fetchHistory(userId);
-	//}
-
-	$: {
-		if (userId === null) {
-			userId = $user.id;
-		}
+	onMount(() => {
+		if (userId === null) userId = $user.id;
 		fetchHistory().then(data => {
 			$currentHistory = data;
 		});
-	}
+	});
 
 </script>
 

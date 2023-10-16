@@ -2,6 +2,7 @@
 	import { Context } from '$lib/components/Context.svelte';
 	import { writable } from 'svelte/store';
 	import { user } from '$lib/stores';
+	import { onMount } from 'svelte';
 
 	export let userId: number | null | undefined = null;
 
@@ -15,25 +16,18 @@
 		return data;
 	}
 
-	const updateS = contextUpdateStat.subscribe(() => {
-		fetchStatistics().then(data => {
-			$currentStatistics = data; // Update the store with the fetched data
-		});
-		console.log("updatestat");
-		console.log(userId);
-	});
-
-	$:  {
-		//$updateStat = 0;
-		if (userId === null) {
-			userId = $user.id;
-		}
+	contextUpdateStat.subscribe(() => {
 		fetchStatistics().then(data => {
 			$currentStatistics = data;
 		});
-		//console.log($updateStat);
-		//console.log($updateStat);
-	}
+	});
+
+	onMount(() => {
+		if (userId === null) userId = $user.id;
+		fetchStatistics().then(data => {
+			$currentStatistics = data;
+		});
+	});
 
 </script>
 
