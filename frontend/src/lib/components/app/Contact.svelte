@@ -136,7 +136,7 @@
 									on:click={() => askGame(friend.id)}
 								/>
 							{/if}
-							<img class="option-icons" src="/write.png" on:dblclick={() => startChat([friend.id])} />
+							<img class="option-icons" src="/write.png" on:click={() => startChat([friend.id])} />
 							{#if friend.status === 'in-game'}
 								<img
 									class="option-icons"

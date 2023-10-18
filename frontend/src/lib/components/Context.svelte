@@ -86,7 +86,6 @@
 		export const friendRequest = (): Writable<User[]> => getContext('friendRequest');
 		export const gameRequest = (): Writable<{ id: number; username: string }[]> =>
 			getContext('gameRequest');
-		export const statistics = (): Writable<Stat> => getContext('statistics');
 		export const chats = (): Writable<Chat[]> => getContext('chats');
 		export const chatsPublic = (): Writable<Chat[]> => getContext('chatsPublic');
 		export const chatId = (): Writable<number | null> => getContext('chatId');
@@ -159,7 +158,6 @@
 		) => string) => getContext('addInstance');
 
 		export const removeInstance = (): ((id: string) => void) => getContext('removeInstance');
-
 		export const askGame = (): ((friendId: number) => string) => getContext('askGame');
 		export const startChat = (): ((membersId: number[], groupName? :string) => void) => getContext('startChat');
 		export const fetchHistory = (): (() => Promise<any>) => getContext('fetchHistory');
@@ -186,7 +184,6 @@
 		export const fetchVerifyPassword = (): ((chatId: number, password: string) => Promise<any>) =>
 			getContext('fetchVerifyPassword');
 
-		export const fetchStatistics = (): (() => Promise<Stat>) => getContext('fetchStatistics');
 		export const socket = (): Readable<Socket> => getContext('socket');
 
 		export const getUnreadMessagesCount = (): ((chat: any, chatUser: any) => number) =>
@@ -299,7 +296,6 @@
 	const blocks = writable<Context.Block[]>([]);
 	const friendRequest = writable<Context.User[]>([]);
 	const gameRequest = writable<{ id: number; username: string }[]>([]);
-	const statistics = writable<Context.Stat>();
 	const unreadConversations = writable(0);
 	const chats = writable<Context.Chat[]>([]);
 	const chatsPublic = writable<Context.Chat[]>([]);
@@ -312,7 +308,6 @@
 	setContext('blocks', blocks);
 	setContext('friendRequest', friendRequest);
 	setContext('gameRequest', gameRequest);
-	setContext('statistics', statistics);
 	setContext('unreadConversations', unreadConversations);
 	setContext('chats', chats);
 	setContext('chatsPublic', chatsPublic);

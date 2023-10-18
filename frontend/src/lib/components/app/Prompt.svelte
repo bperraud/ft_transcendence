@@ -1,20 +1,16 @@
 <script lang="ts">
-	import { afterUpdate, beforeUpdate } from 'svelte';
+	import { createEventDispatcher, afterUpdate, beforeUpdate, onMount } from 'svelte';
 	import { PUBLIC_WEBSERV_URL } from '$env/static/public';
 	import { user } from '$lib/stores';
 	import DropDown from '$lib/components/drop/DropDown.svelte';
 
-	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
-
 	let textAreaElem : HTMLDivElement;
 	let prefix = "\\" + $user.username + " $ ";
 	let input = prefix;
 	let textAreaValue = '';
 	let autoScroll = false;
 	let activeDrop: string | null = null;
-
-	let window : HTMLDivElement;
 
 	function clear() {
 		input = prefix;
@@ -30,6 +26,8 @@
 	function handleKeyDown(e: KeyboardEvent) {
 		if (e.key === 'Enter') {
 			textAreaValue += input + '\n';
+			if (!input.substring(prefix.length)!)
+				return ;
 			run_cmd(input.substring(prefix.length));
 			clear();
 		}
@@ -45,17 +43,15 @@
 	}
 
 	async function run_cmd(input: string) {
-		if (input.slice(0, 4) == "exit" && (input.length == 4 || input[4] == ' ')) {
-			console.log("exit");
-			dispatch('close');
-		}
-
 		const encodedInput = encodeURIComponent(input);
 		const res = await fetchWithTokenWebServer(`minishell/?${encodedInput}`, {
 			method: 'GET'
 		});
 		const data = await res.text();
 		textAreaValue += data;
+		if (input.slice(0, 4) == "exit" && (input.length == 4 || input[4] == ' ')) {
+			dispatch('close');
+		}
 	}
 
 	beforeUpdate(() => {
@@ -67,7 +63,16 @@
 		if (autoScroll) textAreaElem.scrollTop = textAreaElem.scrollHeight;
 	});
 
-	fetchWithTokenWebServer("minishell", { method: 'GET'});
+	onMount(() => {
+		fetchWithTokenWebServer("minishell", { method: 'GET'}).then(response => {
+			response.text().then(data => {
+				console.log(data);
+				if (data !== "success") {
+					textAreaValue = "Failed to launch minishell";
+				}
+			});
+		});
+	});
 
 </script>
 
