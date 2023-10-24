@@ -253,7 +253,7 @@
 	import EditProfile from '$lib/components/app/EditProfile.svelte';
 	import PongKeybinds from '$lib/components/app/pong/PongKeybinds.svelte';
 	import { token, user, loading } from '$lib/stores';
-	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { PUBLIC_BACKEND_URL, PUBLIC_WEBSERV_URL } from '$env/static/public';
 	import type { Socket } from 'socket.io-client';
 	import ioClient from 'socket.io-client';
 	import { onDestroy } from 'svelte';

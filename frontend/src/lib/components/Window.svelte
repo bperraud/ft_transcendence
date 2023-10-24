@@ -138,6 +138,7 @@
 				<button on:click={() => dispatch('minimize')}>
 					<div class="border-inside">_</div>
 				</button>
+				<!--condition pour exit minishell ici-->
 				<button on:click={() => dispatch('close')}>
 					<div class="border-inside">X</div>
 				</button>

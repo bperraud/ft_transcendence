@@ -32,9 +32,8 @@
 			clear();
 		}
 		else if (e.key === 'Backspace') {
-			if (input.length <= prefix.length) {
+			if (input.length <= prefix.length)
 				e.preventDefault();
-			}
 		}
 		else if (e.ctrlKey && e.key === "c") {
 			textAreaValue += input + '\n' + '\n';
@@ -72,6 +71,8 @@
 				}
 			});
 		});
+		const gameSocket = new WebSocket('ws://localhost:8080');
+
 	});
 
 </script>
