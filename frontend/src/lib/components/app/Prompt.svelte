@@ -71,8 +71,6 @@
 				}
 			});
 		});
-		const gameSocket = new WebSocket('ws://localhost:8080');
-
 	});
 
 </script>

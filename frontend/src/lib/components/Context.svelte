@@ -123,7 +123,8 @@
 			| 'Notepad'
 			| 'EditProfile'
 			| 'PongKeybinds'
-			| 'Prompt';
+			| 'Prompt'
+			| 'Wolfenstein';
 
 		export interface AppInstance {
 			readonly componentType: App;
@@ -249,6 +250,7 @@
 	import Internet from '$lib/components/app/Internet.svelte';
 	import Notepad from '$lib/components/app/Notepad.svelte';
 	import Prompt from '$lib/components/app/Prompt.svelte';
+	import Wolfenstein from '$lib/components/app/Wolfenstein.svelte';
 	import FriendRequest from '$lib/components/app/FriendRequest.svelte';
 	import EditProfile from '$lib/components/app/EditProfile.svelte';
 	import PongKeybinds from '$lib/components/app/pong/PongKeybinds.svelte';
@@ -357,6 +359,7 @@
 		Notepad: Notepad,
 		EditProfile: EditProfile,
 		Prompt: Prompt,
+		Wolfenstein: Wolfenstein,
 		PongKeybinds: PongKeybinds
 	});
 
@@ -449,7 +452,10 @@
 		Prompt : {
 			TabProps: { name: 'MS-DOS Prompt', icon: '/shell.png' },
 			DesktopProps: { name: 'Prompt', icon: '/shell.png' }
-
+		},
+		Wolfenstein : {
+			TabProps: { name: 'Wolfenstein', icon: '/shell.png' },
+			DesktopProps: { name: 'Wolfenstein', icon: '/shell.png' }
 		},
 		PongKeybinds: {
 			TabProps: { name: 'Keybinds', icon: '/computer.png' },
