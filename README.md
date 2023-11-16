@@ -16,35 +16,39 @@ To name a fiew : Pong, Shell, Chat, Paint
 
 Firstly you will need to create a .env in the frontend that look like this : 
 
-`DATABASE_URL="postgresql://postgres:123@localhost:5434/nest?schema=public"`
-`JWT_SECRET=secret`
-`FORTYTWO_CLIENT_ID=secret`
-`FORTYTWO_CLIENT_SECRET=secret`
-`APP_URL=http://localhost:3000`
-`CALLBACK=auth/42login/callback`
-`UPLOAD_PATH=backend/uploads/`
-`FRONTEND_URL=http://localhost:5173`
+```yaml
+DATABASE_URL="postgresql://postgres:123@localhost:5434/nest?schema=public"
+JWT_SECRET=secret
+FORTYTWO_CLIENT_ID=secret
+FORTYTWO_CLIENT_SECRET=secret
+APP_URL=http://localhost:3000
+CALLBACK=auth/42login/callback
+UPLOAD_PATH=backend/uploads/
+FRONTEND_URL=http://localhost:5173
+```
 
 use your 42 credentials API keys if you have a 42 intra account.
 
-and in the backend :
+.env in the backend :
 
-`PUBLIC_WEBSERV_URL=http://localhost:8080`
-`PUBLIC_BACKEND_URL=http://localhost:3000`
+```yaml
+PUBLIC_WEBSERV_URL=http://localhost:8080
+PUBLIC_BACKEND_URL=http://localhost:3000
+```
 
-then install the necessary packages in both repository:
+Then install the necessary packages in both repository:
 
 ```sh
 npm i
 ```
 
-To launch the client :
-go to the frontend repository and launch
+To start the client :
+Go to the frontend repository and launch
 ```sh
 npm run dev
 ```
 
-go to the backend repository and launch
+Go to the backend repository and launch
 ```sh
 npm run docker:start
 npm run db:dev:restart
