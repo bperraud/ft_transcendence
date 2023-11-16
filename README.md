@@ -14,7 +14,7 @@ To name a fiew : Pong, Shell, Chat, Paint
 
 ## Installation
 
-Firstly you will need to create a .env inside frontend/ that look like this (use your 42 credentials API keys if you have a 42 intra account)
+Firstly you will need to create a .env in frontend/ that look like this : (use your 42 credentials API keys if you have a 42 intra account)
 
 ```yaml
 DATABASE_URL="postgresql://postgres:123@localhost:5434/nest?schema=public"
@@ -40,13 +40,13 @@ Then install the necessary packages in both repository
 npm i
 ```
 
-To start the client (inside frontend/)
+To start the client (in frontend/)
 
 ```sh
 npm run dev
 ```
 
-To start the server (inside backend/)
+To start the server (in backend/)
 ```sh
 npm run docker:start
 npm run db:dev:restart
