@@ -14,7 +14,7 @@ To name a fiew : Pong, Shell, Chat, Paint
 
 ## Installation
 
-Firstly you will need to create a .env in the frontend that look like this : 
+Firstly you will need to create a .env inside frontend/ that look like this (use your 42 credentials API keys if you have a 42 intra account)
 
 ```yaml
 DATABASE_URL="postgresql://postgres:123@localhost:5434/nest?schema=public"
@@ -27,9 +27,7 @@ UPLOAD_PATH=backend/uploads/
 FRONTEND_URL=http://localhost:5173
 ```
 
-use your 42 credentials API keys if you have a 42 intra account.
-
-.env in the backend :
+.env inside backend/ :
 
 ```yaml
 PUBLIC_WEBSERV_URL=http://localhost:8080
