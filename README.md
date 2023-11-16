@@ -33,16 +33,23 @@ and in the backend :
 `PUBLIC_BACKEND_URL=http://localhost:3000`
 
 then install the necessary packages in both repository:
-`npm i`
+
+```sh
+npm i
+```
 
 To launch the client :
 go to the frontend repository and launch
-`npm run dev`
+```sh
+npm run dev
+```
 
 go to the backend repository and launch
-`npm run docker:start`
-`npm run db:dev:restart`
-`prisma migrate dev`
-`prisma migrate deploy`
-`npm run start:dev`
+```sh
+npm run docker:start
+npm run db:dev:restart
+prisma migrate dev
+prisma migrate deploy
+npm run start:dev
+```
 
