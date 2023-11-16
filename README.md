@@ -36,19 +36,19 @@ PUBLIC_WEBSERV_URL=http://localhost:8080
 PUBLIC_BACKEND_URL=http://localhost:3000
 ```
 
-Then install the necessary packages in both repository:
+Then install the necessary packages in both repository
 
 ```sh
 npm i
 ```
 
-To start the client :
-Go to the frontend repository and launch
+To start the client (inside frontend/)
+
 ```sh
 npm run dev
 ```
 
-Go to the backend repository and launch
+To start the server (inside backend/)
 ```sh
 npm run docker:start
 npm run db:dev:restart
