@@ -1,7 +1,5 @@
 Windows 95 desktop reproduction with additionnal features
 
-TODO : - double notification askgame
-
 ## Description
 
 This web application consist of multiple applications available in a windows 95 style desktop.
